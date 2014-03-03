@@ -418,34 +418,44 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 			return true;
 		}
 		else if(c.getName().equalsIgnoreCase("cast")) {
-			int i = 1;
-			String message = a[0];
-			while(a.length > i) {
-				message = message+" "+a[i];
-				i++;
+			if(s.isOp()) {
+				int i = 1;
+				String message = a[0];
+				while(a.length > i) {
+					message = message+" "+a[i];
+					i++;
+				}
+				Bukkit.broadcastMessage(""+ChatColor.RED+ChatColor.BOLD+message);
 			}
-			Bukkit.broadcastMessage(""+ChatColor.RED+ChatColor.BOLD+message);
+			else {
+				s.sendMessage(ChatColor.RED+"Lolnope.");
+			}
 			return true;
 		}
 		else if(c.getName().equalsIgnoreCase("head")) {
-			Player pl = (Player)s;
-			if(pl != null) {
-				int i = 1;
-				String pseudo = a[0];
-				while(a.length > i) {
-					pseudo = pseudo+" "+a[i];
-					i++;
+			if(s.isOp()) {
+				Player pl = (Player)s;
+				if(pl != null) {
+					int i = 1;
+					String pseudo = a[0];
+					while(a.length > i) {
+						pseudo = pseudo+" "+a[i];
+						i++;
+					}
+					ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
+					SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
+					skullMeta.setOwner(pseudo);
+					skullMeta.setDisplayName(ChatColor.RESET + pseudo + "'s head");
+					skull.setItemMeta(skullMeta);
+					pl.getInventory().addItem(skull);
+					s.sendMessage(ChatColor.RED+pseudo+"'s head given.");
 				}
-				ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
-				SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
-				skullMeta.setOwner(pseudo);
-				skullMeta.setDisplayName(ChatColor.RESET + pseudo + "'s head");
-				skull.setItemMeta(skullMeta);
-				pl.getInventory().addItem(skull);
-				s.sendMessage(ChatColor.RED+pseudo+"'s head given.");
+				else {
+					s.sendMessage(ChatColor.RED+"Please.");
+				}
 			}
 			else {
-				s.sendMessage(ChatColor.RED+"Please.");
+				s.sendMessage(ChatColor.RED+"Lolnope.");
 			}
 		}
 		return false;
