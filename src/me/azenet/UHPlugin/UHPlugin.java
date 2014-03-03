@@ -205,9 +205,11 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 			if (a[0].equalsIgnoreCase("start")) {
 				if (teams.size() == 0) {
 					for (Player p : getServer().getOnlinePlayers()) {
-						UHTeam uht = new UHTeam(p.getName(), p.getName(), ChatColor.WHITE, this);
-						uht.addPlayer(p);
-						teams.add(uht);
+						if(!p.isOp()) {
+							UHTeam uht = new UHTeam(p.getName(), p.getName(), ChatColor.WHITE, this);
+							uht.addPlayer(p);
+							teams.add(uht);
+						}
 					}
 				}
 				if (loc.size() < teams.size()) {
