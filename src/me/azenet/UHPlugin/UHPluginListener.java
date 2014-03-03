@@ -32,6 +32,8 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
@@ -46,6 +48,18 @@ public class UHPluginListener implements Listener {
 	public UHPluginListener(UHPlugin p) {
 		this.p = p;
 	}
+	
+    @EventHandler
+    public void onPlayerTeleport(PlayerTeleportEvent event){
+    Player player = event.getPlayer();
+    TeleportCause cause = event.getCause();
+    Location to = event.getTo();
+     
+    if(cause == TeleportCause.ENDER_PEARL){
+    	event.setCancelled(true);
+    	player.teleport(to);
+    	}
+    }
 	
 	@EventHandler
 	public void onPlayerDeath(final PlayerDeathEvent ev) {
