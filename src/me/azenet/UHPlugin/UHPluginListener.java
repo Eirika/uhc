@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.Sound;
 import org.bukkit.conversations.Conversation;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Ghast;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,6 +20,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
@@ -130,6 +132,12 @@ public class UHPluginListener implements Listener {
 			}
 		}, 1L);
 		ev.getPlayer().setGameMode(GameMode.SURVIVAL);
+	}
+	
+	@EventHandler
+	public void onEntitySpawn(CreatureSpawnEvent e) {
+		if(!p.isGameRunning() || e.getEntityType() == EntityType.WITCH)
+			e.setCancelled(true);
 	}
 	
 	@EventHandler
