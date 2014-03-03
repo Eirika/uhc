@@ -29,7 +29,7 @@ public class UHPrompts {
 		@Override
 		public Prompt acceptInput(ConversationContext context, String input) {
 			if (input.length() > 16) {
-				context.getForWhom().sendRawMessage(ChatColor.RED+"Le nom de la team doit faire 16 caractÃ¨res maximum.");
+				context.getForWhom().sendRawMessage(ChatColor.RED+"Le nom de la team doit faire 16 caractères maximum.");
 				return this;
 			}
 			context.setSessionData("nomTeam", input);
@@ -101,14 +101,14 @@ public class UHPrompts {
 
 		@Override
 		public String getPromptText(ConversationContext context) {
-			return ChatColor.GRAY+"Entrez le nom du joueur Ã  ajouter dans la team "+((ChatColor)context.getSessionData("color"))+context.getSessionData("nomTeam")+ChatColor.WHITE+".";
+			return ChatColor.GRAY+"Entrez le nom du joueur à ajouter dans la team "+((ChatColor)context.getSessionData("color"))+context.getSessionData("nomTeam")+ChatColor.WHITE+".";
 		}
 
 		@Override
 		protected Prompt acceptValidatedInput(ConversationContext context,
 				Player input) {
 			p.getTeam((String) context.getSessionData("nomTeam")).addPlayer(input);
-			context.getForWhom().sendRawMessage(ChatColor.GREEN+input.getName()+ChatColor.DARK_GREEN+" a Ã©tÃ© ajoutÃ© Ã  l'Ã©quipe "+((ChatColor)context.getSessionData("color"))+context.getSessionData("nomTeam")+".");
+			context.getForWhom().sendRawMessage(ChatColor.GREEN+input.getName()+ChatColor.DARK_GREEN+" a été ajouté(e) à  l'équipe "+((ChatColor)context.getSessionData("color"))+context.getSessionData("nomTeam")+".");
 			return Prompt.END_OF_CONVERSATION;
 		}
 		

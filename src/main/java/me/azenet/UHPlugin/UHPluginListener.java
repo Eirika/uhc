@@ -62,21 +62,21 @@ public class UHPluginListener implements Listener {
 				p.setLife((Player)ev.getEntity(), 0);
 			}
 		}, 1L);
-		if (this.p.getConfig().getBoolean("kick-on-death.kick", true)) {
+		if (this.p.getConfig().getBoolean("kick-on-death.kick", true) && p.isGameRunning()) {
 			Bukkit.getScheduler().runTaskLater(this.p, new BukkitRunnable() {
 				
 				@Override
 				public void run() {
-					ev.getEntity().kickPlayer("jayjay");
+					int i = Bukkit.getOnlinePlayers().length - 1;
+					ev.getEntity().kickPlayer("Congrats! You finished at the "+i+" place!");
 				}
 			}, 20L*this.p.getConfig().getInt("kick-on-death.time", 30));
 		}
-		
 		try { 
 			ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
 			SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
 			skullMeta.setOwner(((Player)ev.getEntity()).getName());
-			skullMeta.setDisplayName(ChatColor.RESET + ((Player)ev.getEntity()).getName());
+			skullMeta.setDisplayName(ChatColor.RESET + ((Player)ev.getEntity()).getName() + "'s head");
 			skull.setItemMeta(skullMeta);
 			l.getWorld().dropItem(l, skull);
 		} catch (Exception e) {
