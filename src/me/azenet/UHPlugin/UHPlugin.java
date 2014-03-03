@@ -209,6 +209,8 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 							UHTeam uht = new UHTeam(p.getName(), p.getName(), ChatColor.WHITE, this);
 							uht.addPlayer(p);
 							teams.add(uht);
+							p.setGameMode(GameMode.CREATIVE);
+							p.setGameMode(GameMode.SURVIVAL);
 						}
 					}
 				}
