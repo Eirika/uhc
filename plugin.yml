@@ -4,5 +4,14 @@ version: 0.1
 
 commands:
    uh:
-      description: Ultra Harcore
+      description: Ultra Hardcore
+      usage: /uh <subcommand>
+   life:
+      description: Ultra Hardcore Life
+      usage: /uh <subcommand>
+   cast:
+      description: Ultra Hardcore Cast
+      usage: /uh <subcommand>
+   head:
+      description: Ultra Hardcore Head Giver
       usage: /uh <subcommand>

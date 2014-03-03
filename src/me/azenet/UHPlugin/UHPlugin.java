@@ -284,43 +284,6 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				this.minutesLeft = getEpisodeLength();
 				this.secondsLeft = 0;
 				return true;
-			} else if(c.getName().equalsIgnoreCase("life")) {
-				Player p = Bukkit.getPlayer(a[1]);
-				if(p == null) {
-					s.sendMessage(ChatColor.RED+"Usage: /life <player>");
-					return true;
-				}
-				double life = p.getHealth();
-				s.sendMessage(p.getName()+"'s life is "+life+".");
-				return true;
-			} else if(c.getName().equalsIgnoreCase("cast")) {
-				int i = 1;
-				String message = a[0];
-				while(a.length > i) {
-					message = message+" "+a[i];
-					i++;
-				}
-				Bukkit.broadcastMessage(""+ChatColor.RED+ChatColor.BOLD+message);
-				return true;
-			} else if(c.getName().equalsIgnoreCase("head")) {
-				if(pl != null) {
-					int i = 1;
-					String pseudo = a[0];
-					while(a.length > i) {
-						pseudo = pseudo+" "+a[i];
-						i++;
-					}
-					ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
-					SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
-					skullMeta.setOwner(pseudo);
-					skullMeta.setDisplayName(ChatColor.RESET + pseudo + "'s head");
-					skull.setItemMeta(skullMeta);
-					pl.getInventory().addItem(skull);
-					s.sendMessage(ChatColor.RED+pseudo+"'s head given.");
-				}
-				else {
-					s.sendMessage(ChatColor.RED+"Please.");
-				}
 			} else if (a[0].equalsIgnoreCase("teamsgui")) {
 				Inventory iv = this.getServer().createInventory(pl, 54, "- Teams -");
 				Integer slot = 0;
@@ -441,6 +404,47 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				pl.sendMessage(ChatColor.GRAY+"Génération terminée.");
 				return true;
 			}*/
+		}
+		else if(c.getName().equalsIgnoreCase("life")) {
+			Player p = Bukkit.getPlayer(a[1]);
+			if(p == null) {
+				s.sendMessage(ChatColor.RED+"Usage: /life <player>");
+				return true;
+			}
+			double life = p.getHealth();
+			s.sendMessage(p.getName()+"'s life is "+life+".");
+			return true;
+		}
+		else if(c.getName().equalsIgnoreCase("cast")) {
+			int i = 1;
+			String message = a[0];
+			while(a.length > i) {
+				message = message+" "+a[i];
+				i++;
+			}
+			Bukkit.broadcastMessage(""+ChatColor.RED+ChatColor.BOLD+message);
+			return true;
+		}
+		else if(c.getName().equalsIgnoreCase("head")) {
+			Player pl = (Player)s;
+			if(pl != null) {
+				int i = 1;
+				String pseudo = a[0];
+				while(a.length > i) {
+					pseudo = pseudo+" "+a[i];
+					i++;
+				}
+				ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
+				SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
+				skullMeta.setOwner(pseudo);
+				skullMeta.setDisplayName(ChatColor.RESET + pseudo + "'s head");
+				skull.setItemMeta(skullMeta);
+				pl.getInventory().addItem(skull);
+				s.sendMessage(ChatColor.RED+pseudo+"'s head given.");
+			}
+			else {
+				s.sendMessage(ChatColor.RED+"Please.");
+			}
 		}
 		return false;
 	}

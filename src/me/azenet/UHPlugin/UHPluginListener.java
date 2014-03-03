@@ -50,15 +50,15 @@ public class UHPluginListener implements Listener {
 	}
 	
     @EventHandler
-    public void onPlayerTeleport(PlayerTeleportEvent event){
-    Player player = event.getPlayer();
-    TeleportCause cause = event.getCause();
-    Location to = event.getTo();
-     
-    if(cause == TeleportCause.ENDER_PEARL){
-    	event.setCancelled(true);
-    	player.teleport(to);
-    	}
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+	    Player player = event.getPlayer();
+	    TeleportCause cause = event.getCause();
+	    Location to = event.getTo();
+	     
+	    if(cause == TeleportCause.ENDER_PEARL){
+	    	event.setCancelled(true);
+	    	player.teleport(to);
+	    }
     }
 	
 	@EventHandler
