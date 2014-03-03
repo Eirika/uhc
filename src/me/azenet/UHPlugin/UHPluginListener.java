@@ -129,6 +129,7 @@ public class UHPluginListener implements Listener {
 				p.updatePlayerListName(ev.getPlayer());
 			}
 		}, 1L);
+		ev.getPlayer().setGameMode(GameMode.SURVIVAL);
 	}
 	
 	@EventHandler
