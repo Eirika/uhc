@@ -1,9 +1,9 @@
-Plugin KTP
+CartoonCraft UHC Official Plugin
 ==========
 
-C'est très la source. Se compile avec Maven.
+CartoonCraft UHC Plugin. Original by Azenet. Modified for CartoonCraft UHC by ThePooN. Normally works, but still work in progress. Please report all bugs.
 
 Licence
 =======
 
-GPLv3. Voir le fichier LICENSE pour détails.
+GPLv3. Voir le fichier LICENSE pour d�tails.
