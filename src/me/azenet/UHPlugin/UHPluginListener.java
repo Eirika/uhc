@@ -135,9 +135,17 @@ public class UHPluginListener implements Listener {
 	}
 	
 	@EventHandler
-	public void onEntitySpawn(CreatureSpawnEvent e) {
-		if(!p.isGameRunning() || e.getEntityType() == EntityType.WITCH)
+	public void onCreatureSpawn(CreatureSpawnEvent e) {
+		if(!p.isGameRunning()) {
 			e.setCancelled(true);
+			Bukkit.getLogger().info("Mob spawn cancelled");
+			return;
+		}
+		if(e.getEntityType() == EntityType.WITCH) {
+			e.setCancelled(true);
+			Bukkit.getLogger().info("Witch spawn cancelled");
+			return;
+		}
 	}
 	
 	@EventHandler
