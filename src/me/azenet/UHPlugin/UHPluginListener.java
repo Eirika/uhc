@@ -98,6 +98,11 @@ public class UHPluginListener implements Listener {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		if(ev.getEntity().getKiller() != null) {
+			Player p = ev.getEntity().getKiller();
+			p.giveExpLevels(5);
+		}
 
 	}
 	
