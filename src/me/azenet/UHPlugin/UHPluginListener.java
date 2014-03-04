@@ -100,8 +100,10 @@ public class UHPluginListener implements Listener {
 		}
 		
 		if(ev.getEntity().getKiller() != null) {
-			Player p = ev.getEntity().getKiller();
-			p.giveExpLevels(5);
+			if(ev.getEntity().getKiller() instanceof Player) {
+				Player p = ev.getEntity().getKiller();
+				p.giveExpLevels(5);
+			} 
 		}
 		
 		p.setMatchInfo();
