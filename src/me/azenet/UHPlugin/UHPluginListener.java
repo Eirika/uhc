@@ -79,7 +79,7 @@ public class UHPluginListener implements Listener {
 				p.setLife((Player)ev.getEntity(), 0);
 			}
 		}, 1L);
-		if (p.isGameRunning()) {
+		if (this.p.getConfig().getBoolean("kick-on-death.kick", true) && p.isGameRunning()) {
 			Bukkit.getScheduler().runTaskLater(this.p, new BukkitRunnable() {
 				
 				@Override
