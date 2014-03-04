@@ -57,6 +57,10 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 	private HashMap<String, ConversationFactory> cfs = new HashMap<String, ConversationFactory>();
 	private UHPrompts uhp = null;
 	private HashSet<String> deadPlayers = new HashSet<String>();
+	private Player[] deadPlayersArray = null;
+	private Player[] alivePlayers = null;
+	private UHTeam[] deadTeams = null;
+	private HashSet<UHTeam> deadTeamsAnnounced = new HashSet<UHTeam>();
 	
 	@Override
 	public void onEnable() {
@@ -149,10 +153,28 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 			
 		}
 		
-		int players = Bukkit.getOnlinePlayers().length;
+		alivePlayers = null;
+		int i = 0;
 		for(Player p : Bukkit.getOnlinePlayers()) {
-			if(p.isOp())
-				players--;
+			if(!p.isOp() && !this.isPlayerDead(p.getName())) {
+				alivePlayers[i] = p;
+				i++;
+			}
+		}
+		
+		deadTeams = null;
+		int i2 = 0;
+		for(UHTeam t : teams) {
+			boolean thisTeamDead = false;
+			if(getAliveTeams().contains(t)) {
+				deadTeams[i2] = t;
+				i2++;
+				thisTeamDead = true;
+			}
+			if(thisTeamDead && !deadTeamsAnnounced.contains(t)) {
+				Bukkit.broadcastMessage(""+ChatColor.RED+ChatColor.BOLD+"The team "+t.getDisplayName()+" is disqualified!");
+				deadTeamsAnnounced.add(t);
+			}
 		}
 		
 		Random r = new Random();
@@ -163,7 +185,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 		obj.setDisplayName(this.getScoreboardName());
 		obj.setDisplaySlot(DisplaySlot.SIDEBAR);
 		obj.getScore(Bukkit.getOfflinePlayer(ChatColor.GRAY+"Part "+ChatColor.WHITE+episode)).setScore(7);
-		obj.getScore(Bukkit.getOfflinePlayer(ChatColor.WHITE+""+players+ChatColor.GRAY+" players")).setScore(6);
+		obj.getScore(Bukkit.getOfflinePlayer(ChatColor.WHITE+""+alivePlayers.length+ChatColor.GRAY+" players")).setScore(6);
 		obj.getScore(Bukkit.getOfflinePlayer(ChatColor.WHITE+""+getAliveTeams().size()+ChatColor.GRAY+" teams")).setScore(5);
 		obj.getScore(Bukkit.getOfflinePlayer("")).setScore(4);
 		obj.getScore(Bukkit.getOfflinePlayer(ChatColor.WHITE+formatter.format(this.minutesLeft)+ChatColor.GRAY+":"+ChatColor.WHITE+formatter.format(this.secondsLeft))).setScore(3);
@@ -171,10 +193,20 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 
 	private ArrayList<UHTeam> getAliveTeams() {
 		ArrayList<UHTeam> aliveTeams = new ArrayList<UHTeam>();
-		for (UHTeam t : teams) {
+		/*for (UHTeam t : teams) {
 			for (Player p : t.getPlayers()) {
-				if (p.isOnline() && !aliveTeams.contains(t)) aliveTeams.add(t);
+				if (!deadPlayers.contains(p.getName()) && !aliveTeams.contains(t))
+					aliveTeams.add(t);
 			}
+		}*/
+		for(UHTeam t : teams) {
+			int i = 0;
+			for(Player p : t.getPlayers()) {
+				if(!deadPlayers.contains(p.getName()) && !aliveTeams.contains(t))
+					i++;
+			}
+			if(i != 0 && !aliveTeams.contains(t))
+				aliveTeams.add(t);
 		}
 		return aliveTeams;
 	}
@@ -554,6 +586,12 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 	
 	public void addDead(String name) {
 		deadPlayers.add(name);
+		int i = deadPlayersArray.length;
+		deadPlayersArray[i] = Bukkit.getPlayerExact(name);
+	}
+	
+	public Player[] getDeadPlayers() {
+		return deadPlayersArray;
 	}
 	
 	public String getScoreboardName() {
