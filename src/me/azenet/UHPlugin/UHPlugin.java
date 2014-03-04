@@ -236,6 +236,29 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 		return alivePlayers;
 	}
 	
+	public HashSet<Player> getAlivePlayersHashMap() {
+		
+		int i = 0;
+		
+		for(Player p : Bukkit.getOnlinePlayers()) {
+			if(getTeamForPlayer(p) != null) {
+				i++;
+			}
+			
+		}
+		
+		HashSet<Player> alivePlayers2 = new HashSet<Player>();
+		i = 0;
+		for(Player p : Bukkit.getOnlinePlayers()) {
+			if(getTeamForPlayer(p) != null) {
+				alivePlayers2.add(p);
+			}
+			
+		}
+		
+		return alivePlayers2;
+	}
+	
 	public static String ordinal(int i) {
 	    String[] sufixes = new String[] { "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th" };
 	    switch (i % 100) {

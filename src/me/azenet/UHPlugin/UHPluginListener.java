@@ -66,7 +66,7 @@ public class UHPluginListener implements Listener {
 	
 	@EventHandler
 	public void onPlayerDeath(final PlayerDeathEvent ev) {
-		if(p.isGameRunning() && !ev.getEntity().isOp()) {
+		if(p.isGameRunning() && p.getAlivePlayersHashMap().contains((Player)ev.getEntity())) {
 			Location l = ev.getEntity().getLocation();
 			Player[] ps = Bukkit.getServer().getOnlinePlayers();
 			for (Player pp : ps) {
