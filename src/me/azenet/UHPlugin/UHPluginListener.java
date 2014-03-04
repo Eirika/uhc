@@ -66,46 +66,49 @@ public class UHPluginListener implements Listener {
 	
 	@EventHandler
 	public void onPlayerDeath(final PlayerDeathEvent ev) {
-		Location l = ev.getEntity().getLocation();
-		Player[] ps = Bukkit.getServer().getOnlinePlayers();
-		for (Player pp : ps) {
-			pp.playSound(pp.getLocation(), Sound.WITHER_SPAWN, 1F, 1F);
-		}
-		this.p.addDead(ev.getEntity().getName());
-		Bukkit.getScheduler().runTaskLater(this.p, new BukkitRunnable() {
-			
-			@Override
-			public void run() {
-				p.setLife((Player)ev.getEntity(), 0);
+		if(p.isGameRunning()) {
+			Location l = ev.getEntity().getLocation();
+			Player[] ps = Bukkit.getServer().getOnlinePlayers();
+			for (Player pp : ps) {
+				pp.playSound(pp.getLocation(), Sound.WITHER_SPAWN, 1F, 1F);
 			}
-		}, 1L);
-		if (this.p.getConfig().getBoolean("kick-on-death.kick", true) && p.isGameRunning()) {
+			this.p.addDead(ev.getEntity().getName());
 			Bukkit.getScheduler().runTaskLater(this.p, new BukkitRunnable() {
 				
 				@Override
 				public void run() {
-					int i = p.getAlivePlayers().length;
-					String iS = UHPlugin.ordinal(i);
-					ev.getEntity().kickPlayer("Congrats! You finished at the "+iS+" place!");
+					p.setLife((Player)ev.getEntity(), 0);
 				}
-			}, 20L*this.p.getConfig().getInt("kick-on-death.time", 30));
-		}
-		try { 
-			ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
-			SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
-			skullMeta.setOwner(((Player)ev.getEntity()).getName());
-			skullMeta.setDisplayName(ChatColor.RESET + ((Player)ev.getEntity()).getName() + "'s head");
-			skull.setItemMeta(skullMeta);
-			l.getWorld().dropItem(l, skull);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+			}, 1L);
+			if (this.p.getConfig().getBoolean("kick-on-death.kick", true)) {
+				Bukkit.getScheduler().runTaskLater(this.p, new BukkitRunnable() {
+					
+					@Override
+					public void run() {
+						int i = p.getAlivePlayers().length;
+						String iS = UHPlugin.ordinal(i);
+						ev.getEntity().kickPlayer("Congrats! You finished at the "+iS+" place!");
+					}
+				}, 20L*this.p.getConfig().getInt("kick-on-death.time", 30));
+			}
+			try { 
+				ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
+				SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
+				skullMeta.setOwner(((Player)ev.getEntity()).getName());
+				skullMeta.setDisplayName(ChatColor.RESET + ((Player)ev.getEntity()).getName() + "'s head");
+				skull.setItemMeta(skullMeta);
+				l.getWorld().dropItem(l, skull);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			if(ev.getEntity().getKiller() != null) {
+				if(ev.getEntity().getKiller() instanceof Player) {
+					Player p = ev.getEntity().getKiller();
+					p.giveExpLevels(5);
+				} 
+			}
 		
-		if(ev.getEntity().getKiller() != null) {
-			if(ev.getEntity().getKiller() instanceof Player) {
-				Player p = ev.getEntity().getKiller();
-				p.giveExpLevels(5);
-			} 
 		}
 		
 		p.setMatchInfo();
