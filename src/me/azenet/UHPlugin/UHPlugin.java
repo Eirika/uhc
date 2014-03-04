@@ -172,7 +172,11 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				thisTeamDead = true;
 			}
 			if(thisTeamDead && !deadTeamsAnnounced.contains(t)) {
-				Bukkit.broadcastMessage(""+ChatColor.RED+ChatColor.BOLD+"The team "+t.getDisplayName()+" is disqualified!");
+				if(t.getPlayers().size() != 1)
+					Bukkit.broadcastMessage(""+ChatColor.RED+ChatColor.BOLD+"The team "+t.getDisplayName()+" is disqualified!");
+				else {
+					Bukkit.broadcastMessage(""+ChatColor.RED+ChatColor.BOLD+"The player "+t.getPlayers().get(0).getName()+" is disqualified!");
+				}
 				deadTeamsAnnounced.add(t);
 			}
 		}
