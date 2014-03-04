@@ -153,23 +153,13 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 			
 		}
 		
-		alivePlayers = null;
-		int alivePlayersLength = 0;
-		int i = 0;
-		for(Player p : Bukkit.getOnlinePlayers()) {
-			if(!p.isOp() && !this.isPlayerDead(p.getName())) {
-				alivePlayers[i] = p;
-				alivePlayersLength++;
-				i++;
-			}
-			
-		}
+		int alivePlayersLength = getAlivePlayers().length;
 		
-		deadTeams = null;
+		deadTeams = new UHTeam[99];
 		int i2 = 0;
 		for(UHTeam t : teams) {
 			boolean thisTeamDead = false;
-			if(getAliveTeams().contains(t)) {
+			if(!getAliveTeams().contains(t)) {
 				deadTeams[i2] = t;
 				i2++;
 				thisTeamDead = true;
@@ -221,6 +211,42 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 	@Override
 	public void onDisable() {
 		logger.info("UHPlugin unloaded");
+	}
+	
+	public Player[] getAlivePlayers() {
+		
+		int i = 0;
+		
+		for(Player p : Bukkit.getOnlinePlayers()) {
+			if(getTeamForPlayer(p) != null) {
+				i++;
+			}
+			
+		}
+		
+		alivePlayers = new Player[i];
+		i = 0;
+		for(Player p : Bukkit.getOnlinePlayers()) {
+			if(getTeamForPlayer(p) != null) {
+				alivePlayers[i] = p;
+			}
+			
+		}
+		
+		return alivePlayers;
+	}
+	
+	public static String ordinal(int i) {
+	    String[] sufixes = new String[] { "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th" };
+	    switch (i % 100) {
+	    case 11:
+	    case 12:
+	    case 13:
+	        return i + "th";
+	    default:
+	        return i + sufixes[i % 10];
+
+	    }
 	}
 	
 	@SuppressWarnings("unused")
@@ -593,7 +619,12 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 	
 	public void addDead(String name) {
 		deadPlayers.add(name);
-		int i = deadPlayersArray.length;
+		int i = 0;
+		if(deadPlayersArray == null) {
+			deadPlayersArray = new Player[99];
+		}
+		else
+			i = deadPlayersArray.length;
 		deadPlayersArray[i] = Bukkit.getPlayerExact(name);
 	}
 	
@@ -602,8 +633,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 	}
 	
 	public String getScoreboardName() {
-		//String s = this.getConfig().getString("scoreboard", "Kill The Patrick");
-		String s = "CartoonCraft UHC";
+		String s = this.getConfig().getString("scoreboard", "CartoonCraft UHC");
 		return s.substring(0, Math.min(s.length(), 16));
 	}
 

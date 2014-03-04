@@ -21,6 +21,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
@@ -78,13 +79,14 @@ public class UHPluginListener implements Listener {
 				p.setLife((Player)ev.getEntity(), 0);
 			}
 		}, 1L);
-		if (this.p.getConfig().getBoolean("kick-on-death.kick", true) && p.isGameRunning()) {
+		if (p.isGameRunning()) {
 			Bukkit.getScheduler().runTaskLater(this.p, new BukkitRunnable() {
 				
 				@Override
 				public void run() {
-					int i = Bukkit.getOnlinePlayers().length - 1;
-					ev.getEntity().kickPlayer("Congrats! You finished at the "+i+" place!");
+					int i = p.getAlivePlayers().length;
+					String iS = UHPlugin.ordinal(i);
+					ev.getEntity().kickPlayer("Congrats! You finished at the "+iS+" place!");
 				}
 			}, 20L*this.p.getConfig().getInt("kick-on-death.time", 30));
 		}
@@ -162,11 +164,15 @@ public class UHPluginListener implements Listener {
 	public void onBlockBreakEvent(final BlockBreakEvent ev) {
 		if (!this.p.isGameRunning() && !ev.getPlayer().isOp())
 			ev.setCancelled(true);
+		if(p.isPlayerDead(ev.getPlayer().getName()))
+			ev.setCancelled(true);
 	}
 	
 	@EventHandler
 	public void onBlockPlaceEvent(final BlockPlaceEvent ev) {
 		if (!this.p.isGameRunning() && !ev.getPlayer().isOp())
+			ev.setCancelled(true);
+		if(p.isPlayerDead(ev.getPlayer().getName()))
 			ev.setCancelled(true);
 	}
 	
@@ -276,7 +282,13 @@ public class UHPluginListener implements Listener {
 	@EventHandler
 	public void onEntityDamage(final EntityDamageEvent ev) {
 		if (ev.getEntity() instanceof Player) {
-			if (!p.isTakingDamage()) ev.setCancelled(true);
+			if (!p.isTakingDamage())
+				ev.setCancelled(true);
+			if(ev.getEntityType() == EntityType.PLAYER) {
+				Player pl = (Player)ev.getEntity();
+				if(p.isPlayerDead(pl.getName()))
+					ev.setCancelled(true);
+			}
 			Bukkit.getScheduler().runTaskLater(this.p, new BukkitRunnable() {
 				
 				@Override
@@ -284,6 +296,15 @@ public class UHPluginListener implements Listener {
 					p.updatePlayerListName((Player)ev.getEntity());
 				}
 			}, 1L);
+		}
+	}
+	
+	@EventHandler
+	public void onPvP(EntityDamageByEntityEvent ev) {
+		if(ev.getDamager() instanceof Player) {
+			Player pl = (Player) ev.getDamager();
+			if(p.isPlayerDead(pl.getName()))
+				ev.setCancelled(true);
 		}
 	}
 	
