@@ -419,7 +419,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				}
 				Player p = Bukkit.getPlayer(pseudo);
 				if(p == null) {
-					s.sendMessage(ChatColor.RED+"Unknown player");
+					s.sendMessage(ChatColor.RED+"Unknown player.");
 					return true;
 				}
 				double life = p.getHealth();
