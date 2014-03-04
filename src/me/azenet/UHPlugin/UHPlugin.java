@@ -410,14 +410,26 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 			}*/
 		}
 		else if(c.getName().equalsIgnoreCase("life")) {
-			Player p = Bukkit.getPlayer(a[1]);
-			if(p == null) {
+			if(a.length > 0) {
+				int i = 1;
+				String pseudo = a[0];
+				while(a.length > i) {
+					pseudo = pseudo+" "+a[i];
+					i++;
+				}
+				Player p = Bukkit.getPlayer(pseudo);
+				if(p == null) {
+					s.sendMessage(ChatColor.RED+"Unknown player");
+					return true;
+				}
+				double life = p.getHealth();
+				s.sendMessage(ChatColor.GREEN+p.getName()+"'s life is "+life+".");
+				return true;
+			}
+			else {
 				s.sendMessage(ChatColor.RED+"Usage: /life <player>");
 				return true;
 			}
-			double life = p.getHealth();
-			s.sendMessage(p.getName()+"'s life is "+life+".");
-			return true;
 		}
 		else if(c.getName().equalsIgnoreCase("cast")) {
 			if(s.isOp()) {
@@ -450,14 +462,17 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 					skullMeta.setDisplayName(ChatColor.RESET + pseudo + "'s head");
 					skull.setItemMeta(skullMeta);
 					pl.getInventory().addItem(skull);
-					s.sendMessage(ChatColor.RED+pseudo+"'s head given.");
+					s.sendMessage(ChatColor.GREEN+pseudo+"'s head given.");
+					return true;
 				}
 				else {
 					s.sendMessage(ChatColor.RED+"Please.");
+					return true;
 				}
 			}
 			else {
 				s.sendMessage(ChatColor.RED+"Lolnope.");
+				return true;
 			}
 		}
 		return false;
