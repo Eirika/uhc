@@ -103,6 +103,8 @@ public class UHPluginListener implements Listener {
 			Player p = ev.getEntity().getKiller();
 			p.giveExpLevels(5);
 		}
+		
+		p.setMatchInfo();
 
 	}
 	
