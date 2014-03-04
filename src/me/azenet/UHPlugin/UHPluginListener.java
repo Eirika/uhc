@@ -25,6 +25,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -138,7 +139,7 @@ public class UHPluginListener implements Listener {
 	public void onCreatureSpawn(CreatureSpawnEvent e) {
 		if(!p.isGameRunning()) {
 			e.setCancelled(true);
-			Bukkit.getLogger().info("Mob spawn cancelled");
+			//Bukkit.getLogger().info("Mob spawn cancelled");
 			return;
 		}
 		if(e.getEntityType() == EntityType.WITCH) {
@@ -157,6 +158,12 @@ public class UHPluginListener implements Listener {
 	@EventHandler
 	public void onBlockPlaceEvent(final BlockPlaceEvent ev) {
 		if (!this.p.isGameRunning() && !ev.getPlayer().isOp())
+			ev.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onFoodUpdate(FoodLevelChangeEvent ev) {
+		if(!p.isGameRunning())
 			ev.setCancelled(true);
 	}
 	
