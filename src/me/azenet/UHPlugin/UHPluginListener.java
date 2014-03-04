@@ -332,8 +332,10 @@ public class UHPluginListener implements Listener {
 			pl.sendMessage(ChatColor.GRAY+"The compass points to the nearest player.");
 			pl.setCompassTarget(nearest.getLocation());
 		}
-		else if(ev.getClickedBlock().getY() == 42 && ev.getClickedBlock().getX() == 6 && (ev.getClickedBlock().getZ() == -8 || ev.getClickedBlock().getZ() == -9 || ev.getClickedBlock().getZ() == -10))
+		else if(ev.getAction() == Action.PHYSICAL) {
+			if(ev.getClickedBlock().getY() == 42 && ev.getClickedBlock().getX() == 6 && (ev.getClickedBlock().getZ() == -8 || ev.getClickedBlock().getZ() == -9 || ev.getClickedBlock().getZ() == -10))
 			ev.setCancelled(true);
+		}
 	}
 	
 	@EventHandler
