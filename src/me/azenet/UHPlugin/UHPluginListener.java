@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import me.fromgate.playeffect.PlayEffect;
+import me.fromgate.playeffect.VisualEffect;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -42,6 +45,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class UHPluginListener implements Listener {
@@ -313,13 +317,23 @@ public class UHPluginListener implements Listener {
 	
 	@EventHandler
 	public void onEntityRegainHealth(final EntityRegainHealthEvent ev) {
-		if (ev.getRegainReason() == RegainReason.SATIATED) ev.setCancelled(true);
+		if (ev.getRegainReason() == RegainReason.SATIATED) {
+			ev.setCancelled(true);
+			return;
+		}
 		if (ev.getEntity() instanceof Player) {
 			Bukkit.getScheduler().runTaskLater(this.p, new BukkitRunnable() {
 				
 				@Override
 				public void run() {
+					Player pl = (Player)ev.getEntity();
 					p.updatePlayerListName((Player)ev.getEntity());
+					Plugin vplg = Bukkit.getPluginManager().getPlugin("Play Effect");
+					if(vplg != null && vplg instanceof PlayEffect) {
+						Location l = pl.getLocation();
+						l.setY(l.getY()+1);
+						PlayEffect.play(VisualEffect.HEART, l, "");
+					}
 				}
 			}, 1L);
 		}
