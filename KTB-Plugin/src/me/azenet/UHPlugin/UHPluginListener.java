@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import me.fromgate.playeffect.PlayEffect;
-import me.fromgate.playeffect.VisualEffect;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -45,13 +42,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class UHPluginListener implements Listener {
 
 	UHPlugin p = null;
-	
+
 	public UHPluginListener(UHPlugin p) {
 		this.p = p;
 	}
@@ -90,8 +86,13 @@ public class UHPluginListener implements Listener {
 					@Override
 					public void run() {
 						int i = p.getAlivePlayers().length;
-						String iS = UHPlugin.ordinal(i);
-						ev.getEntity().kickPlayer("Congrats! You finished at the "+iS+" place!");
+                                                String msg;
+                                                if (i == 1){
+                                                    msg = "ère";
+                                                } else {
+                                                    msg = "ème";
+                                                } 
+						ev.getEntity().kickPlayer("Bravo ! Vous finissez à la "+i+msg+" place!");
 					}
 				}, 20L*this.p.getConfig().getInt("kick-on-death.time", 30));
 			}
@@ -131,7 +132,7 @@ public class UHPluginListener implements Listener {
 	public void onPlayerLogin(PlayerLoginEvent ev) {
 		if (this.p.isPlayerDead(ev.getPlayer().getName()) && !this.p.getConfig().getBoolean("allow-reconnect", true)) {
 			ev.setResult(Result.KICK_OTHER);
-			ev.setKickMessage("You are died!");
+			ev.setKickMessage("Vous êtes mort !");
 		}
 	}
 		
@@ -160,7 +161,7 @@ public class UHPluginListener implements Listener {
 			//Bukkit.getLogger().info("Mob spawn cancelled");
 			return;
 		}
-		if(e.getEntityType() == EntityType.WITCH) {
+		if(e.getEntityType() == EntityType.WITCH && !this.p.getSpawnWitch()) {
 			e.setCancelled(true);
 			Bukkit.getLogger().info("Witch spawn cancelled");
 			return;
@@ -169,11 +170,16 @@ public class UHPluginListener implements Listener {
 	
 	@EventHandler
 	public void onBlockBreakEvent(final BlockBreakEvent ev) {
-		if (!this.p.isGameRunning() && !ev.getPlayer().isOp())
-			ev.setCancelled(true);
-		if(p.isPlayerDead(ev.getPlayer().getName()))
-			ev.setCancelled(true);
-	}
+            if (!this.p.isGameRunning() && !ev.getPlayer().isOp())
+                    ev.setCancelled(true);
+            if(p.isPlayerDead(ev.getPlayer().getName()))
+                    ev.setCancelled(true);
+
+            if (ev.getBlock().getType() == Material.GLOWSTONE && !this.p.getPotion2()){
+                ev.getBlock().setType(Material.AIR);
+                ev.getBlock().getWorld().dropItemNaturally(ev.getBlock().getLocation(), new ItemStack(Material.IRON_ORE));
+            }
+        }
 	
 	@EventHandler
 	public void onBlockPlaceEvent(final BlockPlaceEvent ev) {
@@ -216,7 +222,7 @@ public class UHPluginListener implements Listener {
 
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent ev) {
-		if (ev.getInventory().getName().equals("- Teams -")) {
+		if (ev.getInventory().getName().equals("- Equipe -")) {
 			Player pl = (Player) ev.getWhoClicked();
 			ev.setCancelled(true);
 			if (ev.getCurrentItem().getType() == Material.DIAMOND) {
@@ -237,11 +243,11 @@ public class UHPluginListener implements Listener {
 		try {
 			if (ev.getRecipe() instanceof ShapedRecipe) {
 				ShapedRecipe r = (ShapedRecipe)ev.getRecipe();
-				String item = "the compass";
+				String item = "la boussole spéciale";
 				Boolean isCompassValid = false;
 				for (Map.Entry<Character, ItemStack> e : r.getIngredientMap().entrySet()) {
 					if (r.getResult().getType() == Material.GOLDEN_APPLE && e != null && e.getValue() != null && e.getValue().getType() == Material.GOLD_NUGGET) { //gotta cancel
-						item = "the golden apple";
+						item = "la pomme d'or";
 						ev.setCancelled(true);
 					} else if (r.getResult().getType() == Material.COMPASS && e != null && e.getValue() != null && e.getValue().getType() == Material.BONE) {
 						isCompassValid = true;
@@ -249,17 +255,17 @@ public class UHPluginListener implements Listener {
 				}
 				if (!p.getConfig().getBoolean("compass")) isCompassValid = true;
 				if (!isCompassValid && r.getResult().getType() == Material.COMPASS) ev.setCancelled(true);
-				if (ev.isCancelled()) ((Player) ev.getWhoClicked()).sendMessage(ChatColor.RED+"You can't craft "+item+" like this!");
+				if (ev.isCancelled()) ((Player) ev.getWhoClicked()).sendMessage(ChatColor.RED+"Vous ne pouvez pas crafter "+item+" comme cela ! (demander la recette à l'admin)");
 			} else if (ev.getRecipe() instanceof ShapelessRecipe) {
 				ShapelessRecipe r = (ShapelessRecipe) ev.getRecipe();
 				String item = "";
 				for (ItemStack i : r.getIngredientList()) {
 					if (i.getType() == Material.GOLD_NUGGET && r.getResult().getType() == Material.SPECKLED_MELON) { //gotta cancel
-						item = "the glistering melon";
+						item = "la pastèque scintillante";
 						ev.setCancelled(true);
 					}
 				}
-				if (ev.isCancelled()) ((Player) ev.getWhoClicked()).sendMessage(ChatColor.RED+"You can't craft "+item+" like this!");
+				if (ev.isCancelled()) ((Player) ev.getWhoClicked()).sendMessage(ChatColor.RED+"Vous ne pouvez pas crafter "+item+" comme cela ! (demander la recette à l'admin)");
 			}
 		} catch (Exception e) {
 			Bukkit.getLogger().warning(ChatColor.RED+"Crafting error");
@@ -326,19 +332,12 @@ public class UHPluginListener implements Listener {
 				
 				@Override
 				public void run() {
-					Player pl = (Player)ev.getEntity();
 					p.updatePlayerListName((Player)ev.getEntity());
-					Plugin vplg = Bukkit.getPluginManager().getPlugin("Play Effect");
-					if(vplg != null && vplg instanceof PlayEffect) {
-						Location l = pl.getLocation();
-						l.setY(l.getY()+1);
-						PlayEffect.play(VisualEffect.HEART, l, "");
-					}
 				}
 			}, 1L);
 		}
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent ev) {
@@ -356,7 +355,7 @@ public class UHPluginListener implements Listener {
 				}
 			}
 			if (!foundRottenFlesh) {
-				pl.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"You don't have any rotten flesh.");
+				pl.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Vous n'avez pas de chair de zombie.");
 				pl.playSound(pl.getLocation(), Sound.STEP_WOOD, 1F, 1F);
 				return;
 			}
@@ -373,10 +372,10 @@ public class UHPluginListener implements Listener {
 				} catch (Exception e) {}
 			}
 			if (nearest == null) {
-				pl.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Nobody near.");
+				pl.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Seul le silence comble votre requête.");
 				return;
 			}
-			pl.sendMessage(ChatColor.GRAY+"The compass points to the nearest player.");
+			pl.sendMessage(ChatColor.GRAY+"La boussole pointe sur le joueur le plus proche.");
 			pl.setCompassTarget(nearest.getLocation());
 		}
 		else if(ev.getAction() == Action.PHYSICAL) {

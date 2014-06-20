@@ -23,13 +23,13 @@ public class UHPrompts {
 
 		@Override
 		public String getPromptText(ConversationContext context) {
-			return ChatColor.GRAY+"Please enter a name for the team. /cancel to cancel.";
+			return ChatColor.GRAY+"Veuillez entrer un nom pour l'équipe. /cancel pour annuler.";
 		}
 
 		@Override
 		public Prompt acceptInput(ConversationContext context, String input) {
 			if (input.length() > 16) {
-				context.getForWhom().sendRawMessage(ChatColor.RED+"The team's name needs to be <= 16 chars.");
+				context.getForWhom().sendRawMessage(ChatColor.RED+"Le nom de l'équipe doit faire 16 caractères maximum.");
 				return this;
 			}
 			context.setSessionData("nomTeam", input);
@@ -71,7 +71,7 @@ public class UHPrompts {
 				colorsString += s+ChatColor.WHITE+", ";
 			}
 			colorsString = colorsString.substring(0, colorsString.length()-2);
-			return ChatColor.GRAY+"Please enter a color for the team. /cancel to cancel.\n"+colorsString;
+			return ChatColor.GRAY+"Veuillez entrer une couleur pour l'équipe. /cancel pour annuler.\n"+colorsString;
 		}
 
 		@Override
@@ -79,7 +79,7 @@ public class UHPrompts {
 				String input) {
 			context.setSessionData("color", StringToChatColor.getChatColorByName(ChatColor.stripColor(input)));
 			p.createTeam((String) context.getSessionData("nomTeam"), (ChatColor) context.getSessionData("color"));
-			context.getForWhom().sendRawMessage(ChatColor.GRAY+"Team "+((ChatColor)context.getSessionData("color"))+context.getSessionData("nomTeam")+ChatColor.GRAY+" created.");
+			context.getForWhom().sendRawMessage(ChatColor.GRAY+"Team "+((ChatColor)context.getSessionData("color"))+context.getSessionData("nomTeam")+ChatColor.GRAY+" créée.");
 			return Prompt.END_OF_CONVERSATION;
 		}
 
@@ -101,14 +101,14 @@ public class UHPrompts {
 
 		@Override
 		public String getPromptText(ConversationContext context) {
-			return ChatColor.GRAY+"Enter the player name to add to the team "+((ChatColor)context.getSessionData("color"))+context.getSessionData("nomTeam")+ChatColor.WHITE+".";
+			return ChatColor.GRAY+"Entrez le nom du joueur à ajouter dans l'équipe "+((ChatColor)context.getSessionData("color"))+context.getSessionData("nomTeam")+ChatColor.WHITE+".";
 		}
 
 		@Override
 		protected Prompt acceptValidatedInput(ConversationContext context,
 				Player input) {
 			p.getTeam((String) context.getSessionData("nomTeam")).addPlayer(input);
-			context.getForWhom().sendRawMessage(ChatColor.GREEN+input.getName()+ChatColor.DARK_GREEN+" has been added to the team "+((ChatColor)context.getSessionData("color"))+context.getSessionData("nomTeam")+".");
+			context.getForWhom().sendRawMessage(ChatColor.GREEN+input.getName()+ChatColor.DARK_GREEN+" a été ajouté à l'équipe "+((ChatColor)context.getSessionData("color"))+context.getSessionData("nomTeam")+".");
 			return Prompt.END_OF_CONVERSATION;
 		}
 		

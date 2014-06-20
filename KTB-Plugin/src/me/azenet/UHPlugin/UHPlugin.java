@@ -61,7 +61,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 	private Player[] alivePlayers = null;
 	private UHTeam[] deadTeams = null;
 	private HashSet<UHTeam> deadTeamsAnnounced = new HashSet<UHTeam>();
-	
+        
 	@Override
 	public void onEnable() {
 		this.saveDefaultConfig();
@@ -74,7 +74,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				String line;
 				while ((line = br.readLine()) != null) {
 					String[] l = line.split(",");
-					getLogger().info("Adding position "+Integer.parseInt(l[0])+","+Integer.parseInt(l[1])+" from positions.txt");
+					getLogger().info("Ajout de la position "+Integer.parseInt(l[0])+","+Integer.parseInt(l[1])+" depuis positions.txt");
 					addLocation(Integer.parseInt(l[0]), Integer.parseInt(l[1]));
 				}
 			} catch (Exception e) {
@@ -105,6 +105,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 			compass.setIngredient('B', Material.BONE);
 			compass.setIngredient('F', Material.ROTTEN_FLESH);
 			this.getServer().addRecipe(compass);
+                    
 		}
 		
 		getServer().getPluginManager().registerEvents(new UHPluginListener(this), this);
@@ -125,7 +126,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 		.withModality(true)
 		.withFirstPrompt(uhp.getTNP())
 		.withEscapeSequence("/cancel")
-		.thatExcludesNonPlayersWithMessage("You need to be a player.")
+		.thatExcludesNonPlayersWithMessage("Vous devez être un joueur.")
 		.withLocalEcho(false)
 		.addConversationAbandonedListener(this));
 		
@@ -133,7 +134,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 		.withModality(true)
 		.withFirstPrompt(uhp.getPP())
 		.withEscapeSequence("/cancel")
-		.thatExcludesNonPlayersWithMessage("You need to be a player.")
+		.thatExcludesNonPlayersWithMessage("Vous devez être un joueur.")
 		.withLocalEcho(false)
 		.addConversationAbandonedListener(this));
 	}
@@ -166,9 +167,9 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 			}
 			if(thisTeamDead && !deadTeamsAnnounced.contains(t)) {
 				if(t.getPlayers().size() != 1)
-					Bukkit.broadcastMessage(""+ChatColor.RED+ChatColor.BOLD+"The team "+t.getDisplayName()+" is disqualified!");
+					Bukkit.broadcastMessage(""+ChatColor.RED+ChatColor.BOLD+"L'équipe "+t.getDisplayName()+" a perdu !");
 				else {
-					Bukkit.broadcastMessage(""+ChatColor.RED+ChatColor.BOLD+"The player "+t.getPlayers().get(0).getName()+" is disqualified!");
+					Bukkit.broadcastMessage(""+ChatColor.RED+ChatColor.BOLD+"Le joueur "+t.getPlayers().get(0).getName()+" a perdu !");
 				}
 				deadTeamsAnnounced.add(t);
 			}
@@ -181,11 +182,11 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 
 		obj.setDisplayName(this.getScoreboardName());
 		obj.setDisplaySlot(DisplaySlot.SIDEBAR);
-		obj.getScore(Bukkit.getOfflinePlayer(ChatColor.GRAY+"Part "+ChatColor.WHITE+episode)).setScore(7);
-		obj.getScore(Bukkit.getOfflinePlayer(ChatColor.WHITE+""+alivePlayersLength+ChatColor.GRAY+" players")).setScore(6);
-		obj.getScore(Bukkit.getOfflinePlayer(ChatColor.WHITE+""+getAliveTeams().size()+ChatColor.GRAY+" teams")).setScore(5);
+		if(getEpisodeLength() != 0) obj.getScore(Bukkit.getOfflinePlayer(ChatColor.GRAY+"Episode "+ChatColor.WHITE+episode)).setScore(7);
+		obj.getScore(Bukkit.getOfflinePlayer(ChatColor.WHITE+""+alivePlayersLength+ChatColor.GRAY+" joueurs")).setScore(6);
+		obj.getScore(Bukkit.getOfflinePlayer(ChatColor.WHITE+""+getAliveTeams().size()+ChatColor.GRAY+" équipe")).setScore(5);
 		obj.getScore(Bukkit.getOfflinePlayer("")).setScore(4);
-		obj.getScore(Bukkit.getOfflinePlayer(ChatColor.WHITE+formatter.format(this.minutesLeft)+ChatColor.GRAY+":"+ChatColor.WHITE+formatter.format(this.secondsLeft))).setScore(3);
+		if(getEpisodeLength() != 0) obj.getScore(Bukkit.getOfflinePlayer(ChatColor.WHITE+formatter.format(this.minutesLeft)+ChatColor.GRAY+":"+ChatColor.WHITE+formatter.format(this.secondsLeft))).setScore(3);
 	}
 
 	private ArrayList<UHTeam> getAliveTeams() {
@@ -259,6 +260,10 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 		return alivePlayers2;
 	}
 	
+        /*
+        Not more used (not removed in case of translation)
+        **************************************************
+        
 	public static String ordinal(int i) {
 	    String[] sufixes = new String[] { "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th" };
 	    switch (i % 100) {
@@ -271,12 +276,13 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 
 	    }
 	}
+        */
 	
 	@SuppressWarnings("unused")
 	public boolean onCommand(final CommandSender s, Command c, String l, String[] a) {
 		if (c.getName().equalsIgnoreCase("uh")) {
 			if (/*!(s instanceof Player)*/false) {
-				s.sendMessage(ChatColor.RED+"You need to be a player!");
+				s.sendMessage(ChatColor.RED+"Vous devez être un joueur!");
 				return true;
 			}
 			Player pl = null;
@@ -293,17 +299,15 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 			if (a[0].equalsIgnoreCase("start")) {
 				if (teams.size() == 0) {
 					for (Player p : getServer().getOnlinePlayers()) {
-						if(!p.isOp()) {
-							UHTeam uht = new UHTeam(p.getName(), p.getName(), ChatColor.WHITE, this);
-							uht.addPlayer(p);
-							teams.add(uht);
-							p.setGameMode(GameMode.CREATIVE);
-							p.setGameMode(GameMode.SURVIVAL);
-						}
+                                            UHTeam uht = new UHTeam(p.getName(), p.getName(), ChatColor.WHITE, this);
+                                            uht.addPlayer(p);
+                                            teams.add(uht);
+                                            p.setGameMode(GameMode.CREATIVE);
+                                            p.setGameMode(GameMode.SURVIVAL);
 					}
 				}
 				if (loc.size() < teams.size()) {
-					s.sendMessage(ChatColor.RED+"Need more TP locations");
+					s.sendMessage(ChatColor.RED+"Besoin de plus de points de départs pour les joueurs");
 					return true;
 				}
 				LinkedList<Location> unusedTP = loc;
@@ -347,37 +351,42 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				w.setStorm(false);
 				w.setDifficulty(Difficulty.HARD);
 				this.episode = 1;
-				this.minutesLeft = getEpisodeLength();
-				this.secondsLeft = 0;
-				Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new BukkitRunnable() {
-					@Override
-					public void run() {
-						setMatchInfo();
-						secondsLeft--;
-						if (secondsLeft == -1) {
-							minutesLeft--;
-							secondsLeft = 59;
-						}
-						if (minutesLeft == -1) {
-							minutesLeft = getEpisodeLength();
-							secondsLeft = 0;
-							Bukkit.getServer().broadcastMessage(ChatColor.AQUA+"-------- End of part "+episode+" --------");
-							shiftEpisode();
-						}
-					} 
-				}, 20L, 20L);
-				
+                                if(getEpisodeLength() == 0){
+                                    this.minutesLeft = 0;
+                                    this.secondsLeft = 0;
+                                }
+                                else {
+                                    this.minutesLeft = getEpisodeLength();
+                                    this.secondsLeft = 0;
+                                    Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new BukkitRunnable() {
+                                            @Override
+                                            public void run() {
+                                                    setMatchInfo();
+                                                    secondsLeft--;
+                                                    if (secondsLeft == -1) {
+                                                            minutesLeft--;
+                                                            secondsLeft = 59;
+                                                    }
+                                                    if (minutesLeft == -1) {
+                                                            minutesLeft = getEpisodeLength();
+                                                            secondsLeft = 0;
+                                                            Bukkit.getServer().broadcastMessage(ChatColor.AQUA+"-------- Fin de l'épisode "+episode+" --------");
+                                                            shiftEpisode();
+                                                    }
+                                            } 
+                                    }, 20L, 20L);
+                                }
 				Bukkit.getServer().broadcastMessage(ChatColor.GREEN+"--- GO ---");
 				this.gameRunning = true;
 				return true;
 			} else if (a[0].equalsIgnoreCase("shift")) {
-				Bukkit.getServer().broadcastMessage(ChatColor.AQUA+"-------- End of part "+episode+" [forced] --------");
+				Bukkit.getServer().broadcastMessage(ChatColor.AQUA+"-------- Fin de l'épisode "+episode+" [forcée] --------");
 				shiftEpisode();
 				this.minutesLeft = getEpisodeLength();
 				this.secondsLeft = 0;
 				return true;
 			} else if (a[0].equalsIgnoreCase("teamsgui")) {
-				Inventory iv = this.getServer().createInventory(pl, 54, "- Teams -");
+				Inventory iv = this.getServer().createInventory(pl, 54, "- Equipe -");
 				Integer slot = 0;
 				ItemStack is = null;
 				for (UHTeam t : teams) {
@@ -396,7 +405,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				
 				ItemStack is2 = new ItemStack(Material.DIAMOND);
 				ItemMeta im2 = is2.getItemMeta();
-				im2.setDisplayName(ChatColor.AQUA+""+ChatColor.ITALIC+"Create a team");
+				im2.setDisplayName(ChatColor.AQUA+""+ChatColor.ITALIC+"Créer une équipe");
 				is2.setItemMeta(im2);
 				iv.setItem(53, is2);
 				
@@ -404,42 +413,42 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				return true;
 			} else if (a[0].equalsIgnoreCase("newteam")) {
 				if (a.length != 4) {
-					pl.sendMessage(ChatColor.RED+"Usage: /uh newteam name color shownName");
+					pl.sendMessage(ChatColor.RED+"Utilisation: /uh newteam <nomEquipe> <couleur> <nomAffiché>");
 					return true;
 				}
 				if (a[1].length() > 16) {
-					pl.sendMessage(ChatColor.RED+"The team name needs to be <= 16 chars.");
+					pl.sendMessage(ChatColor.RED+"Le nom de l'équipe ne doit pas faire plus de 16 charactères.");
 					return true;
 				}
 				if (a[3].length() > 32) {
-					pl.sendMessage(ChatColor.RED+"The shown name needs to be <= 32 chars.");
+					pl.sendMessage(ChatColor.RED+"Le nom de l'équipe ne doit pas faire plus de 16 charactères.");
 				}
 				ChatColor cc;
 				try {
 					cc = ChatColor.valueOf(a[2].toUpperCase());
 				} catch (IllegalArgumentException e) {
-					pl.sendMessage(ChatColor.RED+"Invalid color.");
+					pl.sendMessage(ChatColor.RED+"Couleur incorrecte.");
 					return true;
 				}
 				teams.add(new UHTeam(a[1], a[3], cc, this));
-				pl.sendMessage(ChatColor.GREEN+"Team created. Use /uh playertoteam "+a[1]+" playerName to add players.");
+				pl.sendMessage(ChatColor.GREEN+"Equipe créée. Utiliser /uh playertoteam "+a[1]+" nomDuJoueur pour l'ajouter à cette équipe.");
 				return true;
 			} else if (a[0].equalsIgnoreCase("playertoteam")) {
 				if (a.length != 3) {
-					pl.sendMessage(ChatColor.RED+"Usage: /uh playertoteam teamName playerName");
+					pl.sendMessage(ChatColor.RED+"Utilisation: /uh playertoteam <nomEquipe> <nomJoueur>");
 					return true;
 				}
 				UHTeam t = getTeam(a[1]);
 				if (t == null) {
-					pl.sendMessage(ChatColor.RED+"This team doesn't exists. Type \"/uh teams\" to list them.");
+					pl.sendMessage(ChatColor.RED+"Cette équipe n'éxiste pas. Ecrire \"/uh teams\" pour lister les équipes éxistantes.");
 					return true;
 				}
 				if (Bukkit.getPlayerExact(a[2]) == null) {
-					pl.sendMessage(ChatColor.RED+"This player doesn't exists. It needs to be connected.");
+					pl.sendMessage(ChatColor.RED+"Ce joueur n'éxiste pas. Le joueur doit être connecté pour être inscrit.");
 					return true;
 				}
 				t.addPlayer(Bukkit.getPlayerExact(a[2]));
-				pl.sendMessage(ChatColor.GREEN+Bukkit.getPlayerExact(a[2]).getName()+" added to the team "+a[1]+".");
+				pl.sendMessage(ChatColor.GREEN+Bukkit.getPlayerExact(a[2]).getName()+" ajouté à l'équipe "+a[1]+".");
 				return true;
 			} else if (a[0].equalsIgnoreCase("teams")) {
 				for (UHTeam t : teams) {
@@ -448,9 +457,13 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				return true;
 			} else if (a[0].equalsIgnoreCase("addspawn")) {
 				addLocation(pl.getLocation().getBlockX(), pl.getLocation().getBlockZ());
-				pl.sendMessage(ChatColor.DARK_GRAY+"Position added: "+ChatColor.GRAY+pl.getLocation().getBlockX()+","+pl.getLocation().getBlockZ());
+				pl.sendMessage(ChatColor.DARK_GRAY+"Position ajoutée: "+ChatColor.GRAY+pl.getLocation().getBlockX()+","+pl.getLocation().getBlockZ());
 				return true;
 			}
+                        
+                        /***************************************
+                      Utilisation du plugin WorldBorder (dynamique)
+                        ***************************************/
 			/*else if (a[0].equalsIgnoreCase("generateWalls")) {
 				pl.sendMessage(ChatColor.GRAY+"Génération en cours...");
 				try {
@@ -507,20 +520,21 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				}
 				Player p = Bukkit.getPlayer(pseudo);
 				if(p == null) {
-					s.sendMessage(ChatColor.RED+"Unknown player.");
+					s.sendMessage(ChatColor.RED+"Joueur inconnu.");
 					return true;
 				}
 				double life = p.getHealth();
-				s.sendMessage(ChatColor.GREEN+p.getName()+"'s life is "+life+".");
+				s.sendMessage(ChatColor.GREEN+"Il reste "+life+" à "+p.getName()+".");
 				return true;
 			}
 			else {
-				s.sendMessage(ChatColor.RED+"Usage: /life <player>");
+				s.sendMessage(ChatColor.RED+"Utilisation: /life <joueur>");
 				return true;
 			}
 		}
 		else if(c.getName().equalsIgnoreCase("cast")) {
 			if(s.isOp()) {
+                            if(a.length > 0) {
 				int i = 1;
 				String message = a[0];
 				while(a.length > i) {
@@ -528,6 +542,11 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 					i++;
 				}
 				Bukkit.broadcastMessage(""+ChatColor.RED+ChatColor.BOLD+message);
+                            }
+                            else {
+				s.sendMessage(ChatColor.RED+"Utilisation: /cast <joueur>");
+				return true;
+                            }
 			}
 			else {
 				s.sendMessage(ChatColor.RED+"Lolnope.");
@@ -536,27 +555,33 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 		}
 		else if(c.getName().equalsIgnoreCase("head")) {
 			if(s.isOp()) {
-				Player pl = (Player)s;
-				if(pl != null) {
-					int i = 1;
-					String pseudo = a[0];
-					while(a.length > i) {
-						pseudo = pseudo+" "+a[i];
-						i++;
-					}
-					ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
-					SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
-					skullMeta.setOwner(pseudo);
-					skullMeta.setDisplayName(ChatColor.RESET + pseudo + "'s head");
-					skull.setItemMeta(skullMeta);
-					pl.getInventory().addItem(skull);
-					s.sendMessage(ChatColor.GREEN+pseudo+"'s head given.");
-					return true;
-				}
-				else {
-					s.sendMessage(ChatColor.RED+"Please.");
-					return true;
-				}
+                            if(a.length > 0) {
+                                Player pl = (Player)s;
+                                if(pl != null) {
+                                        int i = 1;
+                                        String pseudo = a[0];
+                                        while(a.length > i) {
+                                                pseudo = pseudo+" "+a[i];
+                                                i++;
+                                        }
+                                        ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
+                                        SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
+                                        skullMeta.setOwner(pseudo);
+                                        skullMeta.setDisplayName(ChatColor.RESET+"Tête de " + pseudo);
+                                        skull.setItemMeta(skullMeta);
+                                        pl.getInventory().addItem(skull);
+                                        s.sendMessage(ChatColor.GREEN+"Tête de "+pseudo+" donnée.");
+                                        return true;
+                                }
+                                else {
+                                        s.sendMessage(ChatColor.RED+"Please.");
+                                        return true;
+                                }
+                            }
+                            else {
+				s.sendMessage(ChatColor.RED+"Utilisation: /head <joueur>");
+				return true;
+                            }
 			}
 			else {
 				s.sendMessage(ChatColor.RED+"Lolnope.");
@@ -616,11 +641,19 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 	public Integer getEpisodeLength() {
 		return this.getConfig().getInt("episodeLength");
 	}
+        
+        public boolean getSpawnWitch() {
+            return this.getConfig().getBoolean("witch");
+        }
+        
+        public boolean getPotion2() {
+            return this.getConfig().getBoolean("potion2");
+        }
 
 	@Override
 	public void conversationAbandoned(ConversationAbandonedEvent abandonedEvent) {
 		if (!abandonedEvent.gracefulExit()) {
-			abandonedEvent.getContext().getForWhom().sendRawMessage(ChatColor.RED+"Cancelled by "+abandonedEvent.getCanceller().getClass().getName());
+			abandonedEvent.getContext().getForWhom().sendRawMessage(ChatColor.RED+"Abandonné par "+abandonedEvent.getCanceller().getClass().getName());
 		}		
 	}
 	
@@ -656,7 +689,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 	}
 	
 	public String getScoreboardName() {
-		String s = this.getConfig().getString("scoreboard", "CartoonCraft UHC");
+		String s = this.getConfig().getString("scoreboard", "Kill the Bite");
 		return s.substring(0, Math.min(s.length(), 16));
 	}
 
