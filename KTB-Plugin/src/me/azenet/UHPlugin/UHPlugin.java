@@ -351,17 +351,14 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				w.setStorm(false);
 				w.setDifficulty(Difficulty.HARD);
 				this.episode = 1;
-                                if(getEpisodeLength() == 0){
-                                    this.minutesLeft = 0;
-                                    this.secondsLeft = 0;
-                                }
-                                else {
-                                    this.minutesLeft = getEpisodeLength();
-                                    this.secondsLeft = 0;
-                                    Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new BukkitRunnable() {
-                                            @Override
-                                            public void run() {
-                                                    setMatchInfo();
+                                
+                                this.minutesLeft = getEpisodeLength();
+                                this.secondsLeft = 0;
+                                Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new BukkitRunnable() {
+                                        @Override
+                                        public void run() {
+                                                setMatchInfo();
+                                                if(getEpisodeLength() != 0){
                                                     secondsLeft--;
                                                     if (secondsLeft == -1) {
                                                             minutesLeft--;
@@ -373,9 +370,10 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
                                                             Bukkit.getServer().broadcastMessage(ChatColor.AQUA+"-------- Fin de l'épisode "+episode+" --------");
                                                             shiftEpisode();
                                                     }
-                                            } 
-                                    }, 20L, 20L);
-                                }
+                                                }
+                                        } 
+                                }, 20L, 20L);
+                                
 				Bukkit.getServer().broadcastMessage(ChatColor.GREEN+"--- GO ---");
 				this.gameRunning = true;
 				return true;
