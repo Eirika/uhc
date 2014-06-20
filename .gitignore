@@ -2,6 +2,9 @@
 ## Eclipse
 #################
 
+nbproject/
+KTB-Plugin/build.xml
+KTB-Plugin/manifest.mf
 *.pydevproject
 .project
 .metadata
@@ -194,7 +197,6 @@ $RECYCLE.BIN/
 *.egg-info
 dist/
 build/
-nbproject/*
 eggs/
 parts/
 var/
