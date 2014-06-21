@@ -145,10 +145,9 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				String line;
 				while ((line = br.readLine()) != null) {
                                         String[] l = line.split(",");
-					getLogger().info("Ajout de l'equipe "+l[0]+", nom complet "+l[1]+" de couleur "+l[2]+" depuis teams.txt");
+					getLogger().info("Ajout de l'equipe "+l[0]+" de couleur "+l[2]+" depuis teams.txt");
                                         ChatColor cc = ChatColor.valueOf(l[2].toUpperCase());
-                                        getLogger().info(cc.toString()+"   "+l[2]);
-                                        teams.add(new UHTeam(l[0], l[1], cc, this));
+                                        createTeam(l[0], cc);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -283,7 +282,9 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
         public ArrayList<Player> getAllPlayers(){
             ArrayList<Player> onlinePlayers = new ArrayList<Player>();
             for (Player p : Bukkit.getOnlinePlayers()){
-                onlinePlayers.add(p);
+                if (getTeamForPlayer(p) == null){
+                    onlinePlayers.add(p);
+                }
             }
             return onlinePlayers;
         }
@@ -334,6 +335,16 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
                                             p.setGameMode(GameMode.SURVIVAL);
 					}
 				}
+                                ArrayList<UHTeam> unusedTeam = new ArrayList<UHTeam>();
+                                for(UHTeam team : teams){
+                                    if (team.getPlayers().isEmpty()){
+                                        unusedTeam.add(team);
+                                    }
+                                }
+                                for (UHTeam team : unusedTeam) {
+                                    teams.remove(team);
+                                }
+                                
 				if (loc.size() < teams.size()) {
 					s.sendMessage(ChatColor.RED+"Besoin de plus de points de départs pour les joueurs");
 					return true;
@@ -370,6 +381,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 
 					@Override
 					public void run() {
+                                                Bukkit.broadcastMessage("Fin de période d'invincibilité !");
 						damageIsOn = true;
 					}
 				}, 600L);
@@ -412,31 +424,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				this.secondsLeft = 0;
 				return true;
 			} else if (a[0].equalsIgnoreCase("teamsgui")) {
-				Inventory iv = this.getServer().createInventory(pl, 54, "- Equipe -");
-				Integer slot = 0;
-				ItemStack is = null;
-				for (UHTeam t : teams) {
-					is = new ItemStack(Material.BEACON, t.getPlayers().size());
-					ItemMeta im = is.getItemMeta();
-					im.setDisplayName(t.getChatColor()+t.getDisplayName());
-					ArrayList<String> lore = new ArrayList<String>();
-					for (Player p : t.getPlayers()) {
-						lore.add("- "+p.getDisplayName());
-					}
-					im.setLore(lore);
-					is.setItemMeta(im);
-					iv.setItem(slot, is);
-					slot++;
-				}
-				
-				ItemStack is2 = new ItemStack(Material.DIAMOND);
-				ItemMeta im2 = is2.getItemMeta();
-				im2.setDisplayName(ChatColor.AQUA+""+ChatColor.ITALIC+"Créer une équipe");
-				is2.setItemMeta(im2);
-				iv.setItem(53, is2);
-				
-				pl.openInventory(iv);
-				return true;
+				teamGui(pl);
 			} else if (a[0].equalsIgnoreCase("newteam")) {
 				if (a.length != 4) {
 					pl.sendMessage(ChatColor.RED+"Utilisation: /uh newteam <nomEquipe> <couleur> <nomAffiché>");
@@ -694,6 +682,35 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 		}
 		return false;
 	}
+        
+        public boolean teamGui(Player pl){
+            Inventory iv = this.getServer().createInventory(pl, 54, "- Equipe -");
+				Integer slot = 0;
+				ItemStack is = null;
+				for (UHTeam t : teams) {
+					is = new ItemStack(Material.BEACON, t.getPlayers().size());
+					ItemMeta im = is.getItemMeta();
+					im.setDisplayName(t.getDisplayName());
+					ArrayList<String> lore = new ArrayList<String>();
+					for (Player p : t.getPlayers()) {
+						lore.add("- "+p.getDisplayName());
+					}
+					im.setLore(lore);
+					is.setItemMeta(im);
+					iv.setItem(slot, is);
+					slot++;
+				}
+				
+				ItemStack is2 = new ItemStack(Material.DIAMOND);
+				ItemMeta im2 = is2.getItemMeta();
+				im2.setDisplayName(ChatColor.AQUA+""+ChatColor.ITALIC+"Créer une équipe");
+				is2.setItemMeta(im2);
+				iv.setItem(53, is2);
+				
+				pl.openInventory(iv);
+				return true;
+        }
+        
 	public ConversationFactory getConversationFactory(String string) {
 		if (cfs.containsKey(string)) return cfs.get(string);
 		return null;

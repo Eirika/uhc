@@ -224,6 +224,7 @@ public class UHPluginListener implements Listener {
 
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent ev) {
+            if (!p.isGameRunning()){
 		if (ev.getInventory().getName().equals("- Equipe -")) {
 			Player pl = (Player) ev.getWhoClicked();
 			ev.setCancelled(true);
@@ -232,24 +233,14 @@ public class UHPluginListener implements Listener {
 				p.getConversationFactory("teamPrompt").buildConversation(pl).begin();
 			} else if (ev.getCurrentItem().getType() == Material.BEACON) {
                                 pl.closeInventory();
-                                
-                                /*
-				Conversation c = p.getConversationFactory("playerPrompt").buildConversation(pl);
-				c.getContext().setSessionData("nomTeam", ChatColor.stripColor(ev.getCurrentItem().getItemMeta().getDisplayName()));
-                                pl.sendMessage("ok !");
-				c.getContext().setSessionData("color", p.getTeam(ChatColor.stripColor(ev.getCurrentItem().getItemMeta().getDisplayName())).getChatColor());
-                                c.begin();
-                                */
-                                Inventory iv = p.getServer().createInventory(pl, 54, "- Joueurs -");
+
+                                Inventory iv = p.getServer().createInventory(pl, 54, ev.getCurrentItem().getItemMeta().getDisplayName());
 				Integer slot = 0;
 				ItemStack is = null;
 				for (Player joueurs : p.getAllPlayers()) {
 					is = new ItemStack(Material.EMERALD);
 					ItemMeta im = is.getItemMeta();
 					im.setDisplayName(joueurs.getDisplayName());
-                                        ArrayList<String> lore = new ArrayList<String>();
-                                        lore.add(ev.getCurrentItem().getItemMeta().getDisplayName());
-                                        im.setLore(lore);
 					is.setItemMeta(im);
 					iv.setItem(slot, is);
 					slot++;
@@ -257,15 +248,21 @@ public class UHPluginListener implements Listener {
 				pl.openInventory(iv);
 			}
 		}
-                else if (ev.getInventory().getName().equals("- Joueurs -") && ev.getCurrentItem().getType() == Material.EMERALD) {
-                    Player pl = (Player) ev.getWhoClicked();
-                    ev.setCancelled(true);
-                    Bukkit.getLogger().info(Bukkit.getPlayerExact(ev.getCurrentItem().getItemMeta().getDisplayName()).getDisplayName());
-                    UHTeam team = p.getTeam(ev.getCurrentItem().getItemMeta().getLore().get(0));
-                    team.getDisplayName();
-                    //team.addPlayer(Bukkit.getPlayerExact(ev.getCurrentItem().getItemMeta().getDisplayName()));
-                    pl.sendMessage("Le joueur "+ev.getCurrentItem().getItemMeta().getDisplayName()+" à été ajouté à l'équipe "+ev.getCurrentItem().getItemMeta().getLore().get(0));
+                for (UHTeam team : p.getAllTeams()) {
+                    if (ev.getInventory().getTitle().equals(team.getDisplayName())){
+                        if (ev.getCurrentItem().getType() == Material.EMERALD) {
+                            Bukkit.getLogger().info("Emerald");
+                            Player pl = (Player) ev.getWhoClicked();
+                            ev.setCancelled(true);
+                            team.addPlayer(Bukkit.getPlayerExact(ev.getCurrentItem().getItemMeta().getDisplayName()));
+                            pl.sendMessage("Le joueur "+ev.getCurrentItem().getItemMeta().getDisplayName()+" à été ajouté à l'équipe "+team.getDisplayName());
+                            
+                            pl.closeInventory();
+                            p.teamGui(pl);
+                        }
+                    }
                 }
+            }
 	}
 	
 	@EventHandler
