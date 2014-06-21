@@ -38,9 +38,11 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.weather.WeatherChangeEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -229,13 +231,41 @@ public class UHPluginListener implements Listener {
 				pl.closeInventory();
 				p.getConversationFactory("teamPrompt").buildConversation(pl).begin();
 			} else if (ev.getCurrentItem().getType() == Material.BEACON) {
-				pl.closeInventory();
+                                pl.closeInventory();
+                                
+                                /*
 				Conversation c = p.getConversationFactory("playerPrompt").buildConversation(pl);
 				c.getContext().setSessionData("nomTeam", ChatColor.stripColor(ev.getCurrentItem().getItemMeta().getDisplayName()));
+                                pl.sendMessage("ok !");
 				c.getContext().setSessionData("color", p.getTeam(ChatColor.stripColor(ev.getCurrentItem().getItemMeta().getDisplayName())).getChatColor());
-				c.begin();
+                                c.begin();
+                                */
+                                Inventory iv = p.getServer().createInventory(pl, 54, "- Joueurs -");
+				Integer slot = 0;
+				ItemStack is = null;
+				for (Player joueurs : p.getAllPlayers()) {
+					is = new ItemStack(Material.EMERALD);
+					ItemMeta im = is.getItemMeta();
+					im.setDisplayName(joueurs.getDisplayName());
+                                        ArrayList<String> lore = new ArrayList<String>();
+                                        lore.add(ev.getCurrentItem().getItemMeta().getDisplayName());
+                                        im.setLore(lore);
+					is.setItemMeta(im);
+					iv.setItem(slot, is);
+					slot++;
+				}
+				pl.openInventory(iv);
 			}
 		}
+                else if (ev.getInventory().getName().equals("- Joueurs -") && ev.getCurrentItem().getType() == Material.EMERALD) {
+                    Player pl = (Player) ev.getWhoClicked();
+                    ev.setCancelled(true);
+                    Bukkit.getLogger().info(Bukkit.getPlayerExact(ev.getCurrentItem().getItemMeta().getDisplayName()).getDisplayName());
+                    UHTeam team = p.getTeam(ev.getCurrentItem().getItemMeta().getLore().get(0));
+                    team.getDisplayName();
+                    //team.addPlayer(Bukkit.getPlayerExact(ev.getCurrentItem().getItemMeta().getDisplayName()));
+                    pl.sendMessage("Le joueur "+ev.getCurrentItem().getItemMeta().getDisplayName()+" à été ajouté à l'équipe "+ev.getCurrentItem().getItemMeta().getLore().get(0));
+                }
 	}
 	
 	@EventHandler

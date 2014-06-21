@@ -87,7 +87,6 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 		}
 		uhp = new UHPrompts(this);
 		logger = Bukkit.getLogger();
-		logger.info("UHPlugin loaded");
 		random = new Random();
 		
 		goldenMelon = new ShapelessRecipe(new ItemStack(Material.SPECKLED_MELON));
@@ -137,8 +136,29 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 		.thatExcludesNonPlayersWithMessage("Vous devez être un joueur.")
 		.withLocalEcho(false)
 		.addConversationAbandonedListener(this));
+                
+                File equipe = new File("plugins/UHPlugin/teams.txt");
+		if (equipe.exists()) {
+			BufferedReader br = null;
+			try {
+				br = new BufferedReader(new FileReader(equipe));
+				String line;
+				while ((line = br.readLine()) != null) {
+                                        String[] l = line.split(",");
+					getLogger().info("Ajout de l'equipe "+l[0]+", nom complet "+l[1]+" de couleur "+l[2]+" depuis teams.txt");
+                                        ChatColor cc = ChatColor.valueOf(l[2].toUpperCase());
+                                        getLogger().info(cc.toString()+"   "+l[2]);
+                                        teams.add(new UHTeam(l[0], l[1], cc, this));
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				try { if (br != null) br.close(); }
+				catch (Exception e) { e.printStackTrace(); } //c tré l'inline
+			}
+		}
+		logger.info("UHPlugin loaded");
 	}
-	
 	
 	public void addLocation(int x, int z) {
 		loc.add(new Location(getServer().getWorlds().get(0), x, getServer().getWorlds().get(0).getHighestBlockYAt(x,z)+120, z));
@@ -259,6 +279,14 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 		
 		return alivePlayers2;
 	}
+        
+        public ArrayList<Player> getAllPlayers(){
+            ArrayList<Player> onlinePlayers = new ArrayList<Player>();
+            for (Player p : Bukkit.getOnlinePlayers()){
+                onlinePlayers.add(p);
+            }
+            return onlinePlayers;
+        }
 	
         /*
         Not more used (not removed in case of translation)
@@ -629,6 +657,10 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 		return null;
 	}
 
+        public ArrayList<UHTeam> getAllTeams(){
+            return teams;
+        }
+                
 	public UHTeam getTeamForPlayer(Player p) {
 		for(UHTeam t : teams) {
 			if (t.getPlayers().contains(p)) return t;
