@@ -11,7 +11,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.Sound;
-import org.bukkit.conversations.Conversation;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Ghast;
 import org.bukkit.entity.Player;
@@ -225,43 +224,54 @@ public class UHPluginListener implements Listener {
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent ev) {
             if (!p.isGameRunning()){
-		if (ev.getInventory().getName().equals("- Equipe -")) {
-			Player pl = (Player) ev.getWhoClicked();
-			ev.setCancelled(true);
-			if (ev.getCurrentItem().getType() == Material.DIAMOND) {
-				pl.closeInventory();
-				p.getConversationFactory("teamPrompt").buildConversation(pl).begin();
-			} else if (ev.getCurrentItem().getType() == Material.BEACON) {
-                                pl.closeInventory();
-
-                                Inventory iv = p.getServer().createInventory(pl, 54, ev.getCurrentItem().getItemMeta().getDisplayName());
-				Integer slot = 0;
-				ItemStack is = null;
-				for (Player joueurs : p.getAllPlayers()) {
-					is = new ItemStack(Material.EMERALD);
-					ItemMeta im = is.getItemMeta();
-					im.setDisplayName(joueurs.getDisplayName());
-					is.setItemMeta(im);
-					iv.setItem(slot, is);
-					slot++;
-				}
-				pl.openInventory(iv);
-			}
-		}
-                for (UHTeam team : p.getAllTeams()) {
-                    if (ev.getInventory().getTitle().equals(team.getDisplayName())){
-                        if (ev.getCurrentItem().getType() == Material.EMERALD) {
-                            Bukkit.getLogger().info("Emerald");
-                            Player pl = (Player) ev.getWhoClicked();
+                try {
+                    Player pl = (Player) ev.getWhoClicked();
+                    if (ev.getInventory().getName().equals("- Equipe -")) {
                             ev.setCancelled(true);
-                            team.addPlayer(Bukkit.getPlayerExact(ev.getCurrentItem().getItemMeta().getDisplayName()));
-                            pl.sendMessage("Le joueur "+ev.getCurrentItem().getItemMeta().getDisplayName()+" à été ajouté à l'équipe "+team.getDisplayName());
-                            
                             pl.closeInventory();
-                            p.teamGui(pl);
+                            if (ev.getCurrentItem().getType() == Material.DIAMOND) {
+                                    p.getConversationFactory("teamPrompt").buildConversation(pl).begin();
+                            } else if (ev.getCurrentItem().getType() == Material.WOOL) {
+                                    p.addToTeamGui(pl, ev.getCurrentItem().getItemMeta().getDisplayName());
+
+                                    /*
+                                    Inventory iv = p.getServer().createInventory(pl, 54, ev.getCurrentItem().getItemMeta().getDisplayName());
+                                    Integer slot = 0;
+                                    ItemStack is = null;
+                                    for (Player joueurs : p.getAllPlayers()) {
+                                            is = new ItemStack(Material.EMERALD);
+                                            ItemMeta im = is.getItemMeta();
+                                            im.setDisplayName(joueurs.getDisplayName());
+                                            is.setItemMeta(im);
+                                            iv.setItem(slot, is);
+                                            slot++;
+                                    }
+                                    pl.openInventory(iv);
+                                            */
+                            }
+                    }
+                    
+                    for (UHTeam team : p.getAllTeams()) {
+                        if (ev.getInventory().getTitle().equals(team.getDisplayName())){
+                            if (ev.getCurrentItem().getType() == Material.EMERALD) {
+                                ev.setCancelled(true);
+                                team.addPlayer(Bukkit.getPlayerExact(ev.getCurrentItem().getItemMeta().getDisplayName()));
+                                Bukkit.broadcastMessage("Le joueur "+ev.getCurrentItem().getItemMeta().getDisplayName()+" à été ajouté à l'équipe "+team.getDisplayName());
+
+                                pl.closeInventory();
+                                p.addToTeamGui(pl, ev.getInventory().getTitle());
+                            }
                         }
                     }
-                }
+                    
+                    if (ev.getCurrentItem().getType() == Material.DIAMOND_PICKAXE &&
+                            ev.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.AQUA+""+ChatColor.ITALIC+"Précédent")) {
+                        ev.setCancelled(true);
+                        pl.closeInventory();
+                        p.teamGui(pl);
+                    }
+                    
+                } catch (NullPointerException e) {}
             }
 	}
 	

@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
+import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -139,15 +140,30 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
                 
                 File equipe = new File("plugins/UHPlugin/teams.txt");
 		if (equipe.exists()) {
+                        ArrayList<ChatColor> allowedColors = new ArrayList<ChatColor>();
+			allowedColors.add(ChatColor.BLACK);
+			allowedColors.add(ChatColor.BLUE);
+                        allowedColors.add(ChatColor.GRAY);
+                        allowedColors.add(ChatColor.GREEN);
+                        allowedColors.add(ChatColor.RED);
+			allowedColors.add(ChatColor.WHITE);
+			allowedColors.add(ChatColor.YELLOW);
+                        
 			BufferedReader br = null;
 			try {
 				br = new BufferedReader(new FileReader(equipe));
 				String line;
 				while ((line = br.readLine()) != null) {
                                         String[] l = line.split(",");
-					getLogger().info("Ajout de l'equipe "+l[0]+" de couleur "+l[2]+" depuis teams.txt");
-                                        ChatColor cc = ChatColor.valueOf(l[2].toUpperCase());
-                                        createTeam(l[0], cc);
+                                        try {
+                                            ChatColor cc = ChatColor.valueOf(l[2].toUpperCase());
+                                            if (allowedColors.contains(cc)){
+                                                createTeam(l[0], cc);
+                                                logger.info("Ajout de l'equipe "+l[0]+" de couleur "+l[2]+" depuis teams.txt");
+                                            }
+                                        } catch (IllegalArgumentException e) {
+                                                logger.warning("Equipe "+l[0]+" non ajouté car la couleur "+l[2]+" n'existe pas");
+                                        }
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -326,7 +342,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				return true;
 			}
 			if (a[0].equalsIgnoreCase("start")) {
-				if (teams.size() == 0) {
+				if (teams.isEmpty()) {
 					for (Player p : getServer().getOnlinePlayers()) {
                                             UHTeam uht = new UHTeam(p.getName(), p.getName(), ChatColor.WHITE, this);
                                             uht.addPlayer(p);
@@ -341,9 +357,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
                                         unusedTeam.add(team);
                                     }
                                 }
-                                for (UHTeam team : unusedTeam) {
-                                    teams.remove(team);
-                                }
+                                teams.removeAll(unusedTeam);
                                 
 				if (loc.size() < teams.size()) {
 					s.sendMessage(ChatColor.RED+"Besoin de plus de points de départs pour les joueurs");
@@ -424,7 +438,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				this.secondsLeft = 0;
 				return true;
 			} else if (a[0].equalsIgnoreCase("teamsgui")) {
-				teamGui(pl);
+				return teamGui(pl);
 			} else if (a[0].equalsIgnoreCase("newteam")) {
 				if (a.length != 4) {
 					pl.sendMessage(ChatColor.RED+"Utilisation: /uh newteam <nomEquipe> <couleur> <nomAffiché>");
@@ -688,7 +702,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				Integer slot = 0;
 				ItemStack is = null;
 				for (UHTeam t : teams) {
-					is = new ItemStack(Material.BEACON, t.getPlayers().size());
+					is = new ItemStack(Material.WOOL, t.getPlayers().size(), DyeColor.valueOf(t.getChatColor().name()).getData());
 					ItemMeta im = is.getItemMeta();
 					im.setDisplayName(t.getDisplayName());
 					ArrayList<String> lore = new ArrayList<String>();
@@ -709,6 +723,28 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				
 				pl.openInventory(iv);
 				return true;
+        }
+        
+        public void addToTeamGui(Player pl, String title) {
+            Inventory iv = this.getServer().createInventory(pl, 54, title);
+				Integer slot = 0;
+				ItemStack itemPlayer = null;
+				for (Player joueurs : this.getAllPlayers()) {
+					itemPlayer = new ItemStack(Material.EMERALD);
+					ItemMeta im = itemPlayer.getItemMeta();
+					im.setDisplayName(joueurs.getDisplayName());
+					itemPlayer.setItemMeta(im);
+					iv.setItem(slot, itemPlayer);
+					slot++;
+				}
+                                
+                                ItemStack itemReturn = new ItemStack(Material.DIAMOND_PICKAXE);
+				ItemMeta im2 = itemReturn.getItemMeta();
+				im2.setDisplayName(ChatColor.AQUA+""+ChatColor.ITALIC+"Précédent");
+				itemReturn.setItemMeta(im2);
+				iv.setItem(53, itemReturn);
+                                
+				pl.openInventory(iv);
         }
         
 	public ConversationFactory getConversationFactory(String string) {

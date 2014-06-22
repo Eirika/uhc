@@ -46,22 +46,15 @@ public class UHPrompts {
 			super();
 
 			colors = new ArrayList<String>();
-			colors.add(ChatColor.AQUA+"Aqua");
+
 			colors.add(ChatColor.BLACK+"Black");
 			colors.add(ChatColor.BLUE+"Blue");
-			colors.add(ChatColor.DARK_AQUA+"Darkaqua");
-			colors.add(ChatColor.DARK_BLUE+"Darkblue"); 
-			colors.add(ChatColor.DARK_GRAY+"Darkgray");
-			colors.add(ChatColor.DARK_GREEN+"Darkgreen");
-			colors.add(ChatColor.DARK_PURPLE+"Darkpurple");
-			colors.add(ChatColor.DARK_RED+"Darkred");
-			colors.add(ChatColor.GOLD+"Gold"); 
-			colors.add(ChatColor.GRAY+"Gray");
-			colors.add(ChatColor.GREEN+"Green");
-			colors.add(ChatColor.LIGHT_PURPLE+"Lightpurple");
-			colors.add(ChatColor.RED+"Red");
+                        colors.add(ChatColor.GRAY+"Gray");
+                        colors.add(ChatColor.GREEN+"Green");
+                        colors.add(ChatColor.RED+"Red");
 			colors.add(ChatColor.WHITE+"White");
 			colors.add(ChatColor.YELLOW+"Yellow");
+
 		}
 		
 		@Override
@@ -105,8 +98,7 @@ public class UHPrompts {
 		}
 
 		@Override
-		protected Prompt acceptValidatedInput(ConversationContext context,
-				Player input) {
+		protected Prompt acceptValidatedInput(ConversationContext context, Player input) {
 			p.getTeam((String) context.getSessionData("nomTeam")).addPlayer(input);
 			context.getForWhom().sendRawMessage(ChatColor.GREEN+input.getName()+ChatColor.DARK_GREEN+" a été ajouté à l'équipe "+((ChatColor)context.getSessionData("color"))+context.getSessionData("nomTeam")+".");
 			return Prompt.END_OF_CONVERSATION;
@@ -115,19 +107,11 @@ public class UHPrompts {
 	}
 	
 	private enum StringToChatColor {
-		AQUA("Aqua", ChatColor.AQUA),
+                
 		BLACK("Black", ChatColor.BLACK),
 		BLUE("Blue", ChatColor.BLUE), 
-		DARK_AQUA("Darkaqua", ChatColor.DARK_AQUA),
-		DARK_BLUE("Darkblue", ChatColor.DARK_BLUE), 
-		DARK_GRAY("Darkgray", ChatColor.DARK_GRAY),
-		DARK_GREEN("Darkgreen", ChatColor.DARK_GREEN),
-		DARK_PURPLE("Darkpurple", ChatColor.DARK_PURPLE), 
-		DARK_RED("Darkred", ChatColor.DARK_RED),
-		GOLD("Gold", ChatColor.GOLD),
 		GRAY("Gray", ChatColor.GRAY),
 		GREEN("Green", ChatColor.GREEN),
-		LIGHT_PURPLE("Lightpurple", ChatColor.LIGHT_PURPLE),
 		RED("Red", ChatColor.RED), 
 		WHITE("White", ChatColor.WHITE),
 		YELLOW("Yellow", ChatColor.YELLOW);
