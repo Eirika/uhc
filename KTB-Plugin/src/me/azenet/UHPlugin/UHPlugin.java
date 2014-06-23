@@ -730,11 +730,12 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				Integer slot = 0;
 				ItemStack itemPlayer = null;
 				for (Player joueurs : this.getAllPlayers()) {
-					itemPlayer = new ItemStack(Material.EMERALD);
-					ItemMeta im = itemPlayer.getItemMeta();
-					im.setDisplayName(joueurs.getDisplayName());
-					itemPlayer.setItemMeta(im);
-					iv.setItem(slot, itemPlayer);
+                                        itemPlayer = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
+                                        SkullMeta skullMeta = (SkullMeta) itemPlayer.getItemMeta();
+                                        skullMeta.setOwner(joueurs.getDisplayName());
+                                        skullMeta.setDisplayName(joueurs.getDisplayName());
+                                        itemPlayer.setItemMeta(skullMeta);
+                                        iv.setItem(slot, itemPlayer);
 					slot++;
 				}
                                 

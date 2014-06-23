@@ -1,6 +1,6 @@
 name: UHPlugin
 main: me.azenet.UHPlugin.UHPlugin
-version: 0.1
+version: 1.0
 
 commands:
    uh:

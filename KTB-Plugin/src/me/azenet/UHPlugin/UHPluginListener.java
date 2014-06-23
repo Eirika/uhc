@@ -37,11 +37,9 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.weather.WeatherChangeEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -196,7 +194,12 @@ public class UHPluginListener implements Listener {
 			ev.setCancelled(true);
 	}
 	
-/*	@EventHandler
+/*	
+        Catched by WorldBorder plugin
+        =============================
+        
+        
+        @EventHandler
 	public void onPlayerMove(PlayerMoveEvent ev) {
 		Location l = ev.getTo();
 		Integer mapSize = p.getConfig().getInt("map.size");
@@ -219,7 +222,7 @@ public class UHPluginListener implements Listener {
 		if (x < limitXInf || x > limitXSup || z < limitZInf || z > limitZSup) {
 			ev.setCancelled(true);
 		}
-	}*/ // WorldBorder do it better!	
+	}*/	
 
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent ev) {
@@ -233,27 +236,12 @@ public class UHPluginListener implements Listener {
                                     p.getConversationFactory("teamPrompt").buildConversation(pl).begin();
                             } else if (ev.getCurrentItem().getType() == Material.WOOL) {
                                     p.addToTeamGui(pl, ev.getCurrentItem().getItemMeta().getDisplayName());
-
-                                    /*
-                                    Inventory iv = p.getServer().createInventory(pl, 54, ev.getCurrentItem().getItemMeta().getDisplayName());
-                                    Integer slot = 0;
-                                    ItemStack is = null;
-                                    for (Player joueurs : p.getAllPlayers()) {
-                                            is = new ItemStack(Material.EMERALD);
-                                            ItemMeta im = is.getItemMeta();
-                                            im.setDisplayName(joueurs.getDisplayName());
-                                            is.setItemMeta(im);
-                                            iv.setItem(slot, is);
-                                            slot++;
-                                    }
-                                    pl.openInventory(iv);
-                                            */
                             }
                     }
                     
                     for (UHTeam team : p.getAllTeams()) {
                         if (ev.getInventory().getTitle().equals(team.getDisplayName())){
-                            if (ev.getCurrentItem().getType() == Material.EMERALD) {
+                            if (ev.getCurrentItem().getType() == Material.SKULL_ITEM) {
                                 ev.setCancelled(true);
                                 team.addPlayer(Bukkit.getPlayerExact(ev.getCurrentItem().getItemMeta().getDisplayName()));
                                 Bukkit.broadcastMessage("Le joueur "+ev.getCurrentItem().getItemMeta().getDisplayName()+" à été ajouté à l'équipe "+team.getDisplayName());
