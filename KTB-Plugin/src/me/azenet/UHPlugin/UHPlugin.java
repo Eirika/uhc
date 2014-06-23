@@ -66,7 +66,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 	@Override
 	public void onEnable() {
 		this.saveDefaultConfig();
-		 
+
 		File positions = new File("plugins/UHPlugin/positions.txt");
 		if (positions.exists()) {
 			BufferedReader br = null;
@@ -75,11 +75,13 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				String line;
 				while ((line = br.readLine()) != null) {
 					String[] l = line.split(",");
-					getLogger().info("Ajout de la position "+Integer.parseInt(l[0])+","+Integer.parseInt(l[1])+" depuis positions.txt");
 					try{         
                                             addLocation(Integer.parseInt(l[0]), Integer.parseInt(l[1]) , Integer.parseInt(l[2]));
-                                        } catch (NullPointerException e) {
+                                            getLogger().info("Ajout de la position "+Integer.parseInt(l[0])+","+Integer.parseInt(l[1])+","+Integer.parseInt(l[2])+" depuis positions.txt");
+
+                                        } catch (ArrayIndexOutOfBoundsException e) {
                                             addLocation(Integer.parseInt(l[0]), getServer().getWorlds().get(0).getHighestBlockYAt(Integer.parseInt(l[0]), Integer.parseInt(l[1])) , Integer.parseInt(l[1]));
+                                            getLogger().info("Ajout de la position "+Integer.parseInt(l[0])+","+Integer.parseInt(l[1])+" depuis positions.txt");
                                         }
                                 }
 			} catch (Exception e) {

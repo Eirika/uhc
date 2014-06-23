@@ -11,7 +11,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.Sound;
-import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Ghast;
 import org.bukkit.entity.Player;
@@ -164,7 +163,6 @@ public class UHPluginListener implements Listener {
 		if(e.getEntityType() == EntityType.WITCH && !this.p.getSpawnWitch()) {
 			e.setCancelled(true);
 			Bukkit.getLogger().info("Witch spawn cancelled");
-			return;
 		}
 	}
 	
