@@ -76,8 +76,12 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				while ((line = br.readLine()) != null) {
 					String[] l = line.split(",");
 					getLogger().info("Ajout de la position "+Integer.parseInt(l[0])+","+Integer.parseInt(l[1])+" depuis positions.txt");
-					addLocation(Integer.parseInt(l[0]), Integer.parseInt(l[1]));
-				}
+					try{         
+                                            addLocation(Integer.parseInt(l[0]), Integer.parseInt(l[1]) , Integer.parseInt(l[2]));
+                                        } catch (NullPointerException e) {
+                                            addLocation(Integer.parseInt(l[0]), getServer().getWorlds().get(0).getHighestBlockYAt(Integer.parseInt(l[0]), Integer.parseInt(l[1])) , Integer.parseInt(l[2]));
+                                        }
+                                }
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
@@ -177,7 +181,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 		logger.info("UHPlugin loaded");
 	}
 	
-	public void addLocation(int x, int z) {
+	public void addLocation(int x, int y, int z) {
 		loc.add(new Location(getServer().getWorlds().get(0), x, getServer().getWorlds().get(0).getHighestBlockYAt(x,z)+120, z));
 	}
 	
@@ -326,6 +330,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
         */
 	
 	@SuppressWarnings("unused")
+        @Override
 	public boolean onCommand(final CommandSender s, Command c, String l, String[] a) {
 		if (c.getName().equalsIgnoreCase("uh")) {
 			Player pl = null;
@@ -377,7 +382,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 								p.setGameMode(GameMode.SURVIVAL);
 								p.setHealth(20);
 								p.setFoodLevel(20);
-								p.setExhaustion(5F);
+								p.setSaturation(14);
 								p.getInventory().clear();
 								p.getInventory().setArmorContents(new ItemStack[] {new ItemStack(Material.AIR), new ItemStack(Material.AIR), 
 										new ItemStack(Material.AIR), new ItemStack(Material.AIR)});
@@ -442,7 +447,12 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				return teamGui(pl);
                         
                         } else if (a[0].equalsIgnoreCase("addspawn")) {
-				addLocation(pl.getLocation().getBlockX(), pl.getLocation().getBlockZ());
+				addLocation(pl.getLocation().getBlockX(),pl.getWorld().getHighestBlockYAt(pl.getLocation()), pl.getLocation().getBlockZ());
+				pl.sendMessage(ChatColor.DARK_GRAY+"Position ajoutée: "+ChatColor.GRAY+pl.getLocation().getBlockX()+","+pl.getLocation().getBlockZ());
+				return true;
+			
+                        } else if (a[0].equalsIgnoreCase("addspawnY")) {
+				addLocation(pl.getLocation().getBlockX(),pl.getLocation().getBlockY(), pl.getLocation().getBlockZ());
 				pl.sendMessage(ChatColor.DARK_GRAY+"Position ajoutée: "+ChatColor.GRAY+pl.getLocation().getBlockX()+","+pl.getLocation().getBlockZ());
 				return true;
 			}
