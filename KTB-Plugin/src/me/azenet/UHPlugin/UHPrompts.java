@@ -4,12 +4,9 @@ import java.util.ArrayList;
 
 import org.bukkit.ChatColor;
 import org.bukkit.conversations.ConversationContext;
-import org.bukkit.conversations.PlayerNamePrompt;
 import org.bukkit.conversations.Prompt;
 import org.bukkit.conversations.StringPrompt;
 import org.bukkit.conversations.ValidatingPrompt;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 public class UHPrompts {
 
@@ -85,7 +82,11 @@ public class UHPrompts {
 		}
 		
 	}
-	
+	/*
+        =========================
+        Remplaced by addToTeamGui
+        =========================
+        
 	private class PlayerPrompt extends PlayerNamePrompt {
 
 		public PlayerPrompt(Plugin plugin) {
@@ -105,7 +106,7 @@ public class UHPrompts {
 		}
 		
 	}
-	
+	*/
 	private enum StringToChatColor {
                 
 		BLACK("Black", ChatColor.BLACK),
@@ -135,7 +136,8 @@ public class UHPrompts {
 	public TeamNamePrompt getTNP() {
 		return new TeamNamePrompt();
 	}
-	
+        
+	/*
 	public TeamColorPrompt getTCoP() {
 		return new TeamColorPrompt();
 	}
@@ -143,4 +145,5 @@ public class UHPrompts {
 	public PlayerPrompt getPP() {
 		return new PlayerPrompt(p);
 	}
+        */
 }

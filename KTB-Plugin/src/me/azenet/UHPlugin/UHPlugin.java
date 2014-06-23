@@ -130,6 +130,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 		.withLocalEcho(false)
 		.addConversationAbandonedListener(this));
 		
+                /*
 		cfs.put("playerPrompt", new ConversationFactory(this)
 		.withModality(true)
 		.withFirstPrompt(uhp.getPP())
@@ -137,6 +138,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 		.thatExcludesNonPlayersWithMessage("Vous devez être un joueur.")
 		.withLocalEcho(false)
 		.addConversationAbandonedListener(this));
+                */
                 
                 File equipe = new File("plugins/UHPlugin/teams.txt");
 		if (equipe.exists()) {
@@ -326,19 +328,19 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 	@SuppressWarnings("unused")
 	public boolean onCommand(final CommandSender s, Command c, String l, String[] a) {
 		if (c.getName().equalsIgnoreCase("uh")) {
-			if (/*!(s instanceof Player)*/false) {
-				s.sendMessage(ChatColor.RED+"Vous devez être un joueur!");
-				return true;
-			}
 			Player pl = null;
-			if(s instanceof Player)
-				pl = (Player)s;
+			if(s instanceof Player){
+                            pl = (Player)s;
+                        } else {
+                            logger.warning("Not usable in command mode, please login into the game and try again");
+                            return true;
+                        }
 			if (!pl.isOp()) {
 				pl.sendMessage(ChatColor.RED+"Lolnope.");
 				return true;
 			}
 			if (a.length == 0) {
-				pl.sendMessage("Usage : /uh <start|shift|teamsgui|newteam|teams|playertoteam|addspawn>");
+				pl.sendMessage("Usage : /uh <start|shift|teamsgui|addspawn>");
 				return true;
 			}
 			if (a[0].equalsIgnoreCase("start")) {
@@ -405,7 +407,6 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				w.setStorm(false);
 				w.setDifficulty(Difficulty.HARD);
 				this.episode = 1;
-                                
                                 this.minutesLeft = getEpisodeLength();
                                 this.secondsLeft = 0;
                                 Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new BukkitRunnable() {
@@ -439,7 +440,19 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				return true;
 			} else if (a[0].equalsIgnoreCase("teamsgui")) {
 				return teamGui(pl);
-			} else if (a[0].equalsIgnoreCase("newteam")) {
+                        
+                        } else if (a[0].equalsIgnoreCase("addspawn")) {
+				addLocation(pl.getLocation().getBlockX(), pl.getLocation().getBlockZ());
+				pl.sendMessage(ChatColor.DARK_GRAY+"Position ajoutée: "+ChatColor.GRAY+pl.getLocation().getBlockX()+","+pl.getLocation().getBlockZ());
+				return true;
+			}
+                        
+                        /*    
+                                =======================
+                                Remplaced by "teamsgui"
+                                =======================
+                                
+                        } else if (a[0].equalsIgnoreCase("newteam")) {
 				if (a.length != 4) {
 					pl.sendMessage(ChatColor.RED+"Utilisation: /uh newteam <nomEquipe> <couleur> <nomAffiché>");
 					return true;
@@ -483,11 +496,8 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 					pl.sendMessage(ChatColor.DARK_GRAY+"- "+ChatColor.AQUA+t.getName()+ChatColor.DARK_GRAY+" ["+ChatColor.GRAY+t.getDisplayName()+ChatColor.DARK_GRAY+"] - "+ChatColor.GRAY+t.getPlayers().size()+ChatColor.DARK_GRAY+" players");
 				}
 				return true;
-			} else if (a[0].equalsIgnoreCase("addspawn")) {
-				addLocation(pl.getLocation().getBlockX(), pl.getLocation().getBlockZ());
-				pl.sendMessage(ChatColor.DARK_GRAY+"Position ajoutée: "+ChatColor.GRAY+pl.getLocation().getBlockX()+","+pl.getLocation().getBlockZ());
-				return true;
-			}
+			} 
+                                */
                         
                         /***************************************
                       Utilisation du plugin WorldBorder (dynamique)
@@ -575,8 +585,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				s.sendMessage(ChatColor.RED+"Utilisation: /cast <joueur>");
 				return true;
                             }
-			}
-			else {
+			} else {
 				s.sendMessage(ChatColor.RED+"Lolnope.");
 			}
 			return true;
@@ -584,8 +593,8 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 		else if(c.getName().equalsIgnoreCase("head")) {
 			if(s.isOp()) {
                             if(a.length > 0) {
-                                Player pl = (Player)s;
-                                if(pl != null) {
+                                if(s instanceof Player) {
+                                        Player pl = (Player)s;
                                         int i = 1;
                                         String pseudo = a[0];
                                         while(a.length > i) {
@@ -602,7 +611,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
                                         return true;
                                 }
                                 else {
-                                        s.sendMessage(ChatColor.RED+"Please.");
+                                        s.sendMessage(ChatColor.RED+"Not usable in command mode, please login into the game and try again.");
                                         return true;
                                 }
                             }
@@ -610,8 +619,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				s.sendMessage(ChatColor.RED+"Utilisation: /head <joueur>");
 				return true;
                             }
-			}
-			else {
+			} else {
 				s.sendMessage(ChatColor.RED+"Lolnope.");
 				return true;
 			}

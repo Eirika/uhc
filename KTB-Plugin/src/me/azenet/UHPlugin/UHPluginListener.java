@@ -11,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Ghast;
 import org.bukkit.entity.Player;
@@ -140,7 +141,7 @@ public class UHPluginListener implements Listener {
 		if (!this.p.isGameRunning()) {
 			ev.getPlayer().setGameMode(GameMode.CREATIVE);
 			Location l = ev.getPlayer().getWorld().getSpawnLocation();
-			ev.getPlayer().teleport(l.add(0,1,0));
+			ev.getPlayer().teleport(l.add(0, ev.getPlayer().getWorld().getHighestBlockYAt(l), 0));
 		}
 		p.addToScoreboard(ev.getPlayer());
 		Bukkit.getScheduler().runTaskLater(this.p, new BukkitRunnable() {
@@ -324,16 +325,18 @@ public class UHPluginListener implements Listener {
 				ev.setCancelled(true);
 			if(ev.getEntityType() == EntityType.PLAYER) {
 				Player pl = (Player)ev.getEntity();
-				if(p.isPlayerDead(pl.getName()))
+				if(p.isPlayerDead(pl.getName())){
 					ev.setCancelled(true);
-			}
-			Bukkit.getScheduler().runTaskLater(this.p, new BukkitRunnable() {
-				
-				@Override
-				public void run() {
-					p.updatePlayerListName((Player)ev.getEntity());
-				}
-			}, 1L);
+                                } else {
+                                    Bukkit.getScheduler().runTaskLater(this.p, new BukkitRunnable() {
+
+                                            @Override
+                                            public void run() {
+                                                    p.updatePlayerListName((Player)ev.getEntity());
+                                            }
+                                    }, 1L);
+                                }
+                        }
 		}
 	}
 	
