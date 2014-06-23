@@ -79,7 +79,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 					try{         
                                             addLocation(Integer.parseInt(l[0]), Integer.parseInt(l[1]) , Integer.parseInt(l[2]));
                                         } catch (NullPointerException e) {
-                                            addLocation(Integer.parseInt(l[0]), getServer().getWorlds().get(0).getHighestBlockYAt(Integer.parseInt(l[0]), Integer.parseInt(l[1])) , Integer.parseInt(l[2]));
+                                            addLocation(Integer.parseInt(l[0]), getServer().getWorlds().get(0).getHighestBlockYAt(Integer.parseInt(l[0]), Integer.parseInt(l[1])) , Integer.parseInt(l[1]));
                                         }
                                 }
 			} catch (Exception e) {
@@ -182,7 +182,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 	}
 	
 	public void addLocation(int x, int y, int z) {
-		loc.add(new Location(getServer().getWorlds().get(0), x, getServer().getWorlds().get(0).getHighestBlockYAt(x,z)+120, z));
+		loc.add(new Location(getServer().getWorlds().get(0), x, y, z));
 	}
 	
 	public void setMatchInfo() {
@@ -345,7 +345,7 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 				return true;
 			}
 			if (a.length == 0) {
-				pl.sendMessage("Usage : /uh <start|shift|teamsgui|addspawn>");
+				pl.sendMessage("Usage : /uh <start|shift|teamsgui|addspawn|addspawnY>");
 				return true;
 			}
 			if (a[0].equalsIgnoreCase("start")) {
