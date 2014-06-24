@@ -5,23 +5,18 @@ package me.azenet.UHPlugin;
  * @author Tristan
  */
 
-import com.google.common.io.Files;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.nio.file.StandardCopyOption;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
-import org.bukkit.Server;
-import org.bukkit.map.MinecraftFont;
  
 public class UHPluginUpdateChecker {
     UHPlugin plugin;
     public UHPluginUpdateChecker(UHPlugin plugin) {
         this.plugin = plugin;
         currentVersion = plugin.getDescription().getVersion();
-        Bukkit.getLogger().warning(currentVersion);
     }
  
     private String currentVersion;
@@ -38,7 +33,6 @@ public class UHPluginUpdateChecker {
                 String str;
                 while ((str = br.readLine()) != null) {
                     String line = str;
-                    log.warning(line);
                     if (line.contains("version: ")) {
                         if(!line.substring(9).equals(currentVersion)){
                             log.warning("New update available");
