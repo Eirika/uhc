@@ -11,3 +11,4 @@ scoreboard: Kill the Bite
 kick-on-death:
     kick: true
     time: 30
+update-checker: true

@@ -62,11 +62,15 @@ public final class UHPlugin extends JavaPlugin implements ConversationAbandonedL
 	private Player[] alivePlayers = null;
 	private UHTeam[] deadTeams = null;
 	private HashSet<UHTeam> deadTeamsAnnounced = new HashSet<UHTeam>();
-        
+        private UHPluginUpdateChecker updatechecker;
+        public boolean updateNeeded = false;
+
 	@Override
 	public void onEnable() {
 		this.saveDefaultConfig();
-
+                updatechecker = new UHPluginUpdateChecker(this);
+                updateNeeded = updatechecker.startUpdateCheck();
+                
 		File positions = new File("plugins/UHPlugin/positions.txt");
 		if (positions.exists()) {
 			BufferedReader br = null;

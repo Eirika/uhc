@@ -133,6 +133,9 @@ public class UHPluginListener implements Listener {
 			ev.setResult(Result.KICK_OTHER);
 			ev.setKickMessage("Vous êtes mort !");
 		}
+                if(p.updateNeeded){
+                    ev.getPlayer().sendMessage("Une nouvelle version du plugin UHC est disponible !");
+                }
 	}
 		
 	@EventHandler
