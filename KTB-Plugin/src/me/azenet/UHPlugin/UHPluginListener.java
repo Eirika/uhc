@@ -178,7 +178,8 @@ public class UHPluginListener implements Listener {
 
             if (ev.getBlock().getType() == Material.GLOWSTONE && !this.p.getPotion2()){
                 ev.getBlock().setType(Material.AIR);
-                ev.getBlock().getWorld().dropItemNaturally(ev.getBlock().getLocation(), new ItemStack(Material.IRON_ORE));
+                ev.setExpToDrop(5);
+                ev.getPlayer().giveExp(ev.getExpToDrop());
             }
         }
 	
